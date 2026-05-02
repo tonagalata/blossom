@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You — Blossom &amp; Co.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .thanks-page {
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .thanks-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 48px;
+      text-align: center;
+    }
+    .thanks-inner {
+      max-width: 540px;
+    }
+    .thanks-icon {
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 28px;
+      display: block;
+    }
+    .thanks-inner .section-title {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      margin-bottom: 16px;
+    }
+    .thanks-inner .section-body {
+      max-width: 420px;
+      margin: 0 auto 40px;
+    }
+    .thanks-links {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">Blossom <span>&</span> Co.</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="inquiry.html">Inquire</a></li>
+    </ul>
+    <a href="inquiry.html" class="nav-cta">Book Now</a>
+  </nav>
+
+  <div class="thanks-page">
+    <div class="thanks-body">
+      <div class="thanks-inner">
+        <span class="thanks-icon">✦</span>
+        <p class="section-eyebrow">Inquiry Received</p>
+        <h1 class="section-title">Thank you for<br><em>reaching out</em></h1>
+        <p class="section-body">
+          We've received your inquiry and will be in touch within 2 business days.
+          We can't wait to learn more about your vision and start creating something beautiful together.
+        </p>
+        <div class="thanks-links">
+          <a href="portfolio.html" class="btn">View Portfolio</a>
+          <a href="index.html" class="btn-gold btn">Back to Home</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Blossom &amp; Co.</div>
+          <p class="footer-tagline">
+            Boutique floral design and event styling for weddings, celebrations, and moments worth remembering.
+          </p>
+        </div>
+        <div>
+          <h4 class="footer-heading">Navigate</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="inquiry.html">Inquire</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-heading">Connect</h4>
+          <ul class="footer-links">
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">Pinterest</a></li>
+            <li><a href="inquiry.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Blossom &amp; Co. All rights reserved.</span>
+        <span>Floral Design &amp; Event Planning</span>
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>
