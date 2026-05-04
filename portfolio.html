@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio — Blossom &amp; Co.</title>
+  <title>Portfolio — Events in Bloom</title>
   <meta name="description" content="A collection of our most cherished floral design and event styling collaborations.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,21 @@
 <body>
 
   <nav class="nav">
-    <a href="index.html" class="nav-logo">Blossom <span>&</span> Co.</a>
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" width="19" height="26" viewBox="0 0 16 22" fill="none" aria-hidden="true">
+        <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+        <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
+        <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
+        <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
+        <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
+        <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
+      </svg>
+      <span class="nav-logo-text">
+        <span class="logo-events">Events</span>
+        <em class="logo-in">in</em>
+        <span class="logo-bloom">Bloom</span>
+      </span>
+    </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="portfolio.html" class="active">Portfolio</a></li>
@@ -32,137 +46,144 @@
 
     <div class="portfolio-filters">
       <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="weddings">Weddings</button>
-      <button class="filter-btn" data-filter="events">Events &amp; Parties</button>
-      <button class="filter-btn" data-filter="arrangements">Arrangements</button>
-      <button class="filter-btn" data-filter="installations">Installations</button>
+      <button class="filter-btn" data-filter="arrangements">Floral Arrangements</button>
+      <button class="filter-btn" data-filter="events">Private Events</button>
     </div>
 
     <div class="portfolio-grid" id="portfolioGrid">
 
-      <!-- Row 1 -->
-      <div class="portfolio-item wide" data-category="weddings">
-        <img src="https://images.unsplash.com/photo-1519225421980-caffd8e0fa00?auto=format&fit=crop&w=1200&q=80" alt="Wedding ceremony florals">
+      <!-- Row 1: wide arr1 + arr2 -->
+      <div class="portfolio-item wide" data-category="arrangements">
+        <img src="images/arrangements.PNG" alt="Floral arrangement">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Weddings</span>
-          <span class="portfolio-item-title">The Harrington Wedding</span>
-        </div>
-      </div>
-
-      <div class="portfolio-item" data-category="arrangements">
-        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80" alt="White rose arrangement">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Arrangements</span>
+          <span class="portfolio-item-category">Floral Arrangements</span>
           <span class="portfolio-item-title">Garden Collection</span>
         </div>
       </div>
 
-      <!-- Row 2 -->
-      <div class="portfolio-item" data-category="events">
-        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=600&q=80" alt="Elegant event table">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Events &amp; Parties</span>
-          <span class="portfolio-item-title">Golden Gala</span>
-        </div>
-      </div>
-
-      <div class="portfolio-item" data-category="weddings">
-        <img src="https://images.unsplash.com/photo-1490750967868-88df5691bb30?auto=format&fit=crop&w=600&q=80" alt="Bridal bouquet">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Weddings</span>
-          <span class="portfolio-item-title">Bridal Bouquet</span>
-        </div>
-      </div>
-
       <div class="portfolio-item" data-category="arrangements">
-        <img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?auto=format&fit=crop&w=600&q=80" alt="Pink floral arrangement">
+        <img src="images/arrangements2.PNG" alt="Seasonal arrangement">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Arrangements</span>
+          <span class="portfolio-item-category">Floral Arrangements</span>
           <span class="portfolio-item-title">Spring Blooms</span>
         </div>
       </div>
 
-      <!-- Row 3 -->
-      <div class="portfolio-item" data-category="installations">
-        <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&q=80" alt="Floral arch installation">
+      <!-- Row 2: pe1 + arr3 + pe2 -->
+      <div class="portfolio-item" data-category="events">
+        <img src="images/private_event.PNG" alt="Private event florals">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Installations</span>
-          <span class="portfolio-item-title">Ceremony Arch</span>
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Spring Celebration</span>
         </div>
       </div>
 
-      <div class="portfolio-item wide" data-category="events">
-        <img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=1200&q=80" alt="Wedding reception table">
+      <div class="portfolio-item" data-category="arrangements">
+        <img src="images/arrangements3.PNG" alt="Floral arrangement">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Events &amp; Parties</span>
-          <span class="portfolio-item-title">Garden Reception</span>
-        </div>
-      </div>
-
-      <!-- Row 4 -->
-      <div class="portfolio-item" data-category="weddings">
-        <img src="https://images.unsplash.com/photo-1534430480872-b58c5e56c44d?auto=format&fit=crop&w=600&q=80" alt="Wild garden wedding flowers">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Weddings</span>
-          <span class="portfolio-item-title">Wild Garden Wedding</span>
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Botanica Series</span>
         </div>
       </div>
 
       <div class="portfolio-item" data-category="events">
-        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80" alt="Birthday party arrangement">
+        <img src="images/private_event2.PNG" alt="Event styling">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Events &amp; Parties</span>
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Garden Party</span>
+        </div>
+      </div>
+
+      <!-- Row 3: arr4 + wide pe3 -->
+      <div class="portfolio-item" data-category="arrangements">
+        <img src="images/arrangements4.PNG" alt="Floral arrangement">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Wildflower Edit</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item wide" data-category="events">
+        <img src="images/private_event3.PNG" alt="Private event design">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Intimate Dinner</span>
+        </div>
+      </div>
+
+      <!-- Row 4: pe4 + arr5 + arr6 -->
+      <div class="portfolio-item" data-category="events">
+        <img src="images/private_event4.PNG" alt="Event florals">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Private Events</span>
           <span class="portfolio-item-title">Birthday Soirée</span>
         </div>
       </div>
 
       <div class="portfolio-item" data-category="arrangements">
-        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5c?auto=format&fit=crop&w=600&q=80" alt="Table centerpiece">
+        <img src="images/arrangements5.PNG" alt="Floral arrangement">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Arrangements</span>
-          <span class="portfolio-item-title">Golden Centerpiece</span>
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Fresh Cut Collection</span>
         </div>
       </div>
 
-      <!-- Row 5 -->
-      <div class="portfolio-item wide" data-category="installations">
-        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80" alt="Floral wall installation">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Installations</span>
-          <span class="portfolio-item-title">Floral Wall</span>
-        </div>
-      </div>
-
-      <div class="portfolio-item" data-category="weddings">
-        <img src="https://images.unsplash.com/photo-1561181286-d1e7e82f4c94?auto=format&fit=crop&w=600&q=80" alt="Wedding centerpiece">
-        <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Weddings</span>
-          <span class="portfolio-item-title">The Ashford Wedding</span>
-        </div>
-      </div>
-
-      <!-- Row 6 -->
       <div class="portfolio-item" data-category="arrangements">
-        <img src="https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?auto=format&fit=crop&w=600&q=80" alt="Autumn floral arrangement">
+        <img src="images/arrangements6.PNG" alt="Floral arrangement">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Arrangements</span>
-          <span class="portfolio-item-title">Autumn Harvest</span>
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Signature Studio</span>
+        </div>
+      </div>
+
+      <!-- Row 5: wide arr7 + pe5 -->
+      <div class="portfolio-item wide" data-category="arrangements">
+        <img src="images/arrangements7.PNG" alt="Floral arrangement">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Seasonal Edit</span>
         </div>
       </div>
 
       <div class="portfolio-item" data-category="events">
-        <img src="https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?auto=format&fit=crop&w=600&q=80" alt="Corporate event styling">
+        <img src="images/private_event5.PNG" alt="Private event">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Events &amp; Parties</span>
-          <span class="portfolio-item-title">Corporate Dinner</span>
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Summer Gathering</span>
         </div>
       </div>
 
-      <div class="portfolio-item" data-category="weddings">
-        <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80" alt="Pastel wedding bouquet">
+      <!-- Row 6: pe6 + arr8 + arr9 -->
+      <div class="portfolio-item" data-category="events">
+        <img src="images/private_event6.PNG" alt="Event florals">
         <div class="portfolio-item-overlay">
-          <span class="portfolio-item-category">Weddings</span>
-          <span class="portfolio-item-title">Pastel Romance</span>
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Sunset Celebration</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item" data-category="arrangements">
+        <img src="images/arrangements8.PNG" alt="Floral arrangement">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Pastel Dreams</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item" data-category="arrangements">
+        <img src="images/arrangements9.PNG" alt="Floral arrangement">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Floral Arrangements</span>
+          <span class="portfolio-item-title">Studio Arrangement</span>
+        </div>
+      </div>
+
+      <!-- Row 7: pe7 -->
+      <div class="portfolio-item" data-category="events">
+        <img src="images/private_event7.PNG" alt="Private event">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Private Events</span>
+          <span class="portfolio-item-title">Evening Reception</span>
         </div>
       </div>
 
@@ -181,9 +202,19 @@
     <footer>
       <div class="footer-grid">
         <div>
-          <div class="footer-brand">Blossom &amp; Co.</div>
+          <div class="footer-brand">
+            <svg class="footer-brand-icon" width="13" height="18" viewBox="0 0 16 22" fill="none" aria-hidden="true">
+              <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+              <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
+              <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
+              <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
+              <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
+              <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
+            </svg>
+            Events in Bloom
+          </div>
           <p class="footer-tagline">
-            Boutique floral design and event styling for weddings, celebrations, and moments worth remembering.
+            Floral arrangements, event styling, backdrop rentals, and in-home subscriptions — blooms for every occasion.
           </p>
         </div>
         <div>
@@ -204,8 +235,8 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2025 Blossom &amp; Co. All rights reserved.</span>
-        <span>Floral Design &amp; Event Planning</span>
+        <span>© 2025 Events in Bloom. All rights reserved.</span>
+        <span>Floral Arrangements &amp; Event Styling</span>
       </div>
     </footer>
 
@@ -247,7 +278,7 @@
     portfolioItems.forEach(item => {
       item.addEventListener('click', () => {
         const img = item.querySelector('img');
-        lightboxImg.src = img.src.replace('w=600', 'w=1400').replace('w=1200', 'w=1600');
+        lightboxImg.src = img.src;
         lightboxImg.alt = img.alt;
         lightbox.classList.add('open');
         document.body.style.overflow = 'hidden';
