@@ -92,7 +92,7 @@ button {
 }
 
 .logo-events {
-  font-size: 1.7rem;
+  font-size: clamp(1.35rem, 4.8vw, 1.7rem);
   font-weight: 400;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -101,13 +101,13 @@ button {
 
 .logo-in {
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: clamp(0.83rem, 3vw, 1.05rem);
   font-weight: 300;
   color: var(--gold);
 }
 
 .logo-bloom {
-  font-size: 1.7rem;
+  font-size: clamp(1.35rem, 4.8vw, 1.7rem);
   font-weight: 400;
   font-style: italic;
   color: var(--text);
@@ -886,6 +886,105 @@ footer {
   display: block;
 }
 
+/* ===== Hamburger ===== */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--text);
+  border-radius: 1px;
+  transition: all var(--transition);
+}
+
+/* ===== Mobile Slide Menu ===== */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(300px, 85vw);
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg);
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  flex-direction: column;
+  padding: 32px 36px;
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.08);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 18, 0.35);
+  z-index: 190;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.mobile-menu-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mobile-menu-close {
+  align-self: flex-end;
+  padding: 4px;
+  color: var(--text-mid);
+  margin-bottom: 48px;
+  transition: color var(--transition);
+}
+
+.mobile-menu-close:hover {
+  color: var(--text);
+}
+
+.mobile-nav-links {
+  list-style: none;
+  flex: 1;
+}
+
+.mobile-nav-links li {
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-nav-links a {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text);
+  padding: 18px 0;
+  letter-spacing: 0.02em;
+  transition: color var(--transition);
+}
+
+.mobile-nav-links a:hover {
+  color: var(--gold);
+}
+
+.mobile-book-btn {
+  display: block;
+  text-align: center;
+  margin-top: 36px;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .about {
@@ -921,11 +1020,32 @@ footer {
 
 @media (max-width: 768px) {
   .nav {
-    padding: 0 24px;
+    padding: 0 20px;
   }
 
   .nav-links {
     display: none;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  .nav-hamburger {
+    display: flex;
+  }
+
+  .nav-logo {
+    gap: 7px;
+  }
+
+  .nav-logo-text {
+    gap: 3px;
+  }
+
+  .nav-logo-icon {
+    width: 13px;
+    height: 18px;
   }
 
   .services {
