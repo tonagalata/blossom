@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Netlify Forms</title>
+  </head>
+  <body>
+    <!--
+      Netlify Forms detection file for the Next.js OpenNext runtime.
+      This file must be static (in /public) so Netlify can discover forms at deploy time.
+    -->
+    <form name="inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="inquiry" />
+      <p><label>Skip this: <input name="bot-field" /></label></p>
+
+      <input name="first_name" type="text" />
+      <input name="last_name" type="text" />
+      <input name="email" type="email" />
+      <input name="phone" type="tel" />
+      <select name="event_type">
+        <option value="wedding">Wedding</option>
+        <option value="engagement">Engagement Party</option>
+        <option value="birthday">Birthday Celebration</option>
+        <option value="baby-shower">Baby Shower</option>
+        <option value="bridal-shower">Bridal Shower</option>
+        <option value="corporate">Corporate Event</option>
+        <option value="gala">Gala or Fundraiser</option>
+        <option value="other">Other</option>
+      </select>
+      <input name="event_date" type="date" />
+      <input name="guest_count" type="number" />
+      <select name="budget">
+        <option value="under-2k">Under $2,000</option>
+        <option value="2-5k">$2,000 – $5,000</option>
+        <option value="5-10k">$5,000 – $10,000</option>
+        <option value="10-20k">$10,000 – $20,000</option>
+        <option value="20k+">$20,000+</option>
+      </select>
+      <input name="venue" type="text" />
+      <input name="color_palette" type="text" />
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>
