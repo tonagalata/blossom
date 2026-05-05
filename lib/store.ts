@@ -31,7 +31,12 @@ async function blobSet(storeName: string, key: string, value: unknown): Promise<
 async function blobSetRaw(storeName: string, key: string, data: Buffer, contentType: string): Promise<void> {
   const { getStore } = await import('@netlify/blobs')
   const store = getStore(storeName)
-  await store.set(key, data.buffer as ArrayBuffer, { metadata: { contentType } })
+  // Node.js Buffers can be views into a larger ArrayBuffer; slice to exact bytes.
+  const arrayBuffer: ArrayBuffer = data.buffer.slice(
+    data.byteOffset,
+    data.byteOffset + data.byteLength
+  ) as ArrayBuffer
+  await store.set(key, arrayBuffer, { metadata: { contentType } })
 }
 
 async function blobGetRaw(storeName: string, key: string): Promise<{ data: Buffer; contentType: string } | null> {
