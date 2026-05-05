@@ -29,7 +29,7 @@
       text-align: center;
     }
     .thanks-inner {
-      max-width: 540px;
+      max-width: 580px;
     }
     .thanks-icon {
       font-size: 2rem;
@@ -42,7 +42,7 @@
       margin-bottom: 16px;
     }
     .thanks-inner .section-body {
-      max-width: 420px;
+      max-width: 460px;
       margin: 0 auto 40px;
     }
     .thanks-links {
@@ -51,23 +51,83 @@
       justify-content: center;
       flex-wrap: wrap;
     }
+    .next-steps {
+      margin-top: 56px;
+      padding: 40px 40px;
+      background: var(--warm);
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .next-steps-heading {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .next-steps ol {
+      padding-left: 20px;
+      margin: 0 0 28px;
+    }
+    .next-steps li {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    .next-steps li strong {
+      font-weight: 500;
+      color: var(--text);
+    }
+    .packet-download {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: #fff;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .packet-download:hover {
+      border-color: var(--gold);
+    }
+    .packet-icon {
+      font-size: 1.5rem;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .packet-label {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.4;
+    }
+    .packet-label strong {
+      display: block;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.92rem;
+      margin-bottom: 2px;
+    }
+    @media (max-width: 600px) {
+      .thanks-body { padding: 60px 24px; }
+      .next-steps { padding: 28px 24px; }
+    }
   </style>
 </head>
 <body>
 
   <nav class="nav">
     <a href="index.html" class="nav-logo">
-      <svg class="nav-logo-icon" width="19" height="26" viewBox="0 0 16 22" fill="none" aria-hidden="true">
-        <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
-        <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
-        <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
-        <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
-        <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
-        <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
-      </svg>
       <span class="nav-logo-text">
-        <span class="logo-events">Events</span>
-        <em class="logo-in">in</em>
+        <span class="logo-bloom">Events</span>
+        <em class="logo-bloom">in</em>
         <span class="logo-bloom">Bloom</span>
       </span>
     </a>
@@ -75,6 +135,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="portfolio.html">Portfolio</a></li>
       <li><a href="inquiry.html">Inquire</a></li>
+      <li><a href="index.html#about">About</a></li>
     </ul>
     <a href="inquiry.html" class="nav-cta">Book Now</a>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">
@@ -112,6 +173,22 @@
           <a href="portfolio.html" class="btn">View Portfolio</a>
           <a href="index.html" class="btn-gold btn">Back to Home</a>
         </div>
+
+        <div class="next-steps">
+          <p class="next-steps-heading">Next Steps</p>
+          <ol>
+            <li><strong>Download the welcome packet below</strong> — it includes your booking terms and service agreement.</li>
+            <li><strong>Fill in your details</strong> — complete the client information and review the agreement.</li>
+            <li><strong>Return it to us</strong> — email the signed packet to <strong>mibloomsdmv@gmail.com</strong> to secure your date.</li>
+          </ol>
+          <a class="packet-download" href="miblooms_co_welcome_packet.pdf" download>
+            <span class="packet-icon">⬇</span>
+            <span class="packet-label">
+              <strong>Client Welcome Packet & Service Agreement</strong>
+              Download, complete, and email back to confirm your booking
+            </span>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -119,15 +196,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-brand">
-            <svg class="footer-brand-icon" width="13" height="18" viewBox="0 0 16 22" fill="none" aria-hidden="true">
-              <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
-              <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
-              <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
-              <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
-              <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
-              <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
-            </svg>
-            Events in Bloom
+                        Events in Bloom
           </div>
           <p class="footer-tagline">
             Boutique floral design and event styling for weddings, celebrations, and moments worth remembering.

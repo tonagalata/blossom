@@ -19,17 +19,9 @@
 
   <nav class="nav">
     <a href="index.html" class="nav-logo">
-      <svg class="nav-logo-icon" width="19" height="26" viewBox="0 0 16 22" fill="none" aria-hidden="true">
-        <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
-        <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
-        <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
-        <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
-        <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
-        <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
-      </svg>
       <span class="nav-logo-text">
-        <span class="logo-events">Events</span>
-        <em class="logo-in">in</em>
+        <span class="logo-bloom">Events</span>
+        <em class="logo-bloom">in</em>
         <span class="logo-bloom">Bloom</span>
       </span>
     </a>
@@ -37,6 +29,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="portfolio.html" class="active">Portfolio</a></li>
       <li><a href="inquiry.html">Inquire</a></li>
+      <li><a href="index.html#about">About</a></li>
     </ul>
     <a href="inquiry.html" class="nav-cta">Book Now</a>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">
@@ -72,6 +65,7 @@
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="arrangements">Floral Arrangements</button>
       <button class="filter-btn" data-filter="events">Private Events</button>
+      <button class="filter-btn" data-filter="rentals">Backdrop Rentals</button>
     </div>
 
     <div class="portfolio-grid" id="portfolioGrid">
@@ -110,13 +104,13 @@
         </div>
       </div>
 
-      <div class="portfolio-item" data-category="events">
+      <!-- <div class="portfolio-item" data-category="events">
         <img src="images/private_event2.PNG" alt="Event styling">
         <div class="portfolio-item-overlay">
           <span class="portfolio-item-category">Private Events</span>
           <span class="portfolio-item-title">Garden Party</span>
         </div>
-      </div>
+      </div> -->
 
       <!-- Row 3: arr4 + wide pe3 -->
       <div class="portfolio-item" data-category="arrangements">
@@ -178,13 +172,13 @@
       </div>
 
       <!-- Row 6: pe6 + arr8 + arr9 -->
-      <div class="portfolio-item" data-category="events">
+      <!-- <div class="portfolio-item" data-category="events">
         <img src="images/private_event6.PNG" alt="Event florals">
         <div class="portfolio-item-overlay">
           <span class="portfolio-item-category">Private Events</span>
           <span class="portfolio-item-title">Sunset Celebration</span>
         </div>
-      </div>
+      </div> -->
 
       <div class="portfolio-item" data-category="arrangements">
         <img src="images/arrangements8.PNG" alt="Floral arrangement">
@@ -211,6 +205,31 @@
         </div>
       </div>
 
+      <!-- Row 8: rentals -->
+      <div class="portfolio-item wide" data-category="rentals">
+        <img src="images/rental.PNG" alt="Floral backdrop rental">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Backdrop Rentals</span>
+          <span class="portfolio-item-title">Floral Wall</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item" data-category="rentals">
+        <img src="images/rental2.PNG" alt="Backdrop rental setup">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Backdrop Rentals</span>
+          <span class="portfolio-item-title">Floral Backdrop Rental</span>
+        </div>
+      </div>
+
+      <div class="portfolio-item" data-category="rentals">
+        <img src="images/rental3.jpeg" alt="Garden backdrop rental">
+        <div class="portfolio-item-overlay">
+          <span class="portfolio-item-category">Backdrop Rentals</span>
+          <span class="portfolio-item-title">Garden Backdrop</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- CTA -->
@@ -227,15 +246,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-brand">
-            <svg class="footer-brand-icon" width="13" height="18" viewBox="0 0 16 22" fill="none" aria-hidden="true">
-              <line x1="8" y1="22" x2="8" y2="1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
-              <path d="M8,17 C6,16 2,15 1,12 C2,13 6,16 8,17Z" fill="currentColor" opacity="0.45"/>
-              <path d="M8,17 C10,16 14,15 15,12 C14,13 10,16 8,17Z" fill="currentColor" opacity="0.45"/>
-              <path d="M8,10 C6,9 2,8 1,5 C2,6 6,9 8,10Z" fill="currentColor" opacity="0.72"/>
-              <path d="M8,10 C10,9 14,8 15,5 C14,6 10,9 8,10Z" fill="currentColor" opacity="0.72"/>
-              <path d="M8,1 C6,2.5 6,4.5 8,5.5 C10,4.5 10,2.5 8,1Z" fill="currentColor"/>
-            </svg>
-            Events in Bloom
+                        Events in Bloom
           </div>
           <p class="footer-tagline">
             Floral arrangements, event styling, backdrop rentals, and in-home subscriptions — blooms for every occasion.
