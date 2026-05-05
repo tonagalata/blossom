@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Footer from '@/components/Footer'
 import { getSiteConfig } from '@/lib/store'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Events in Bloom — Florals for Every Occasion' }
 
 export default async function Home() {

@@ -1,6 +1,7 @@
 import { getPortfolioItems } from '@/lib/store'
 import PortfolioClient from './PortfolioClient'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Portfolio — Events in Bloom' }
 
 export default async function Portfolio() {
