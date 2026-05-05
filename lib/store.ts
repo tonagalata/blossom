@@ -2,6 +2,10 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import type { PortfolioItem, SiteConfig } from './types'
 
+// NETLIFY=true is set during both build AND runtime on Netlify.
+// Blobs only work at runtime (not during the build phase), so every blob
+// helper wraps its entire body in try/catch and returns a safe default on
+// failure — this lets the build succeed and real data is served at runtime.
 const IS_NETLIFY = process.env.NETLIFY === 'true'
 const DATA_DIR = path.join(process.cwd(), 'data')
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
@@ -9,9 +13,9 @@ const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
 // ─── Netlify Blobs helpers ───────────────────────────────────────────────────
 
 async function blobGet<T>(storeName: string, key: string): Promise<T | null> {
-  const { getStore } = await import('@netlify/blobs')
-  const store = getStore(storeName)
   try {
+    const { getStore } = await import('@netlify/blobs')
+    const store = getStore(storeName)
     return await store.get(key, { type: 'json' }) as T
   } catch {
     return null
@@ -31,9 +35,9 @@ async function blobSetRaw(storeName: string, key: string, data: Buffer, contentT
 }
 
 async function blobGetRaw(storeName: string, key: string): Promise<{ data: Buffer; contentType: string } | null> {
-  const { getStore } = await import('@netlify/blobs')
-  const store = getStore(storeName)
   try {
+    const { getStore } = await import('@netlify/blobs')
+    const store = getStore(storeName)
     const result = await store.getWithMetadata(key, { type: 'blob' })
     if (!result) return null
     const { data, metadata } = result as { data: Blob; metadata: Record<string, unknown> }
@@ -45,9 +49,9 @@ async function blobGetRaw(storeName: string, key: string): Promise<{ data: Buffe
 }
 
 async function blobList(storeName: string): Promise<string[]> {
-  const { getStore } = await import('@netlify/blobs')
-  const store = getStore(storeName)
   try {
+    const { getStore } = await import('@netlify/blobs')
+    const store = getStore(storeName)
     const { blobs } = await store.list()
     return blobs.map(b => b.key)
   } catch {
