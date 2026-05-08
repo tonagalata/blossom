@@ -88,19 +88,14 @@ async function localWrite(filename: string, data: unknown): Promise<void> {
 
 // ─── Portfolio ───────────────────────────────────────────────────────────────
 
+import { listPortfolioItems, savePortfolioItems as dbSavePortfolioItems } from './db'
+
 export async function getPortfolioItems(): Promise<PortfolioItem[]> {
-  if (IS_NETLIFY) {
-    return (await blobGet<PortfolioItem[]>('portfolio', 'items')) ?? []
-  }
-  return localRead<PortfolioItem[]>('portfolio.json', [])
+  return listPortfolioItems()
 }
 
 export async function savePortfolioItems(items: PortfolioItem[]): Promise<void> {
-  if (IS_NETLIFY) {
-    await blobSet('portfolio', 'items', items)
-  } else {
-    await localWrite('portfolio.json', items)
-  }
+  await dbSavePortfolioItems(items)
 }
 
 // ─── Site config ─────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { createClient } from '@libsql/client'
-import type { Inquiry, InquiryAttachment, PaymentRequest, MembershipPlan, Member, MemberInquiry } from './types'
+import type { Inquiry, InquiryAttachment, PaymentRequest, MembershipPlan, Member, MemberInquiry, PortfolioItem } from './types'
 
 function makeClient() {
   return createClient({
@@ -88,7 +88,30 @@ async function init() {
       replied_at TEXT,
       FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS portfolio_items (
+      id         TEXT PRIMARY KEY,
+      src        TEXT NOT NULL,
+      alt        TEXT NOT NULL,
+      title      TEXT NOT NULL,
+      category   TEXT NOT NULL,
+      wide       INTEGER NOT NULL DEFAULT 0,
+      visible    INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
   `)
+
+  // Seed portfolio if table is empty
+  const count = await db.execute('SELECT COUNT(*) as n FROM portfolio_items')
+  if ((count.rows[0].n as number) === 0) {
+    for (const item of PORTFOLIO_SEED) {
+      await db.execute({
+        sql: `INSERT OR IGNORE INTO portfolio_items (id, src, alt, title, category, wide, visible, sort_order, created_at)
+              VALUES (?,?,?,?,?,?,?,?,?)`,
+        args: [item.id, item.src, item.alt, item.title, item.category, item.wide ? 1 : 0, item.visible ? 1 : 0, item.order, item.createdAt],
+      })
+    }
+  }
 }
 
 export function getDb(): Promise<typeof db> {
@@ -317,3 +340,55 @@ export async function replyToMemberInquiry(id: string, reply: string): Promise<v
     args: [reply, new Date().toISOString(), id],
   })
 }
+
+// ─── Portfolio ────────────────────────────────────────────────────────────────
+
+export async function listPortfolioItems(): Promise<PortfolioItem[]> {
+  const client = await getDb()
+  const result = await client.execute('SELECT * FROM portfolio_items ORDER BY sort_order ASC, created_at ASC')
+  return result.rows.map(r => ({
+    id: r.id as string,
+    src: r.src as string,
+    alt: r.alt as string,
+    title: r.title as string,
+    category: r.category as PortfolioItem['category'],
+    wide: r.wide === 1,
+    visible: r.visible === 1,
+    order: r.sort_order as number,
+    createdAt: r.created_at as string,
+  }))
+}
+
+export async function savePortfolioItems(items: PortfolioItem[]): Promise<void> {
+  const client = await getDb()
+  await client.execute('DELETE FROM portfolio_items')
+  for (const item of items) {
+    await client.execute({
+      sql: `INSERT INTO portfolio_items (id, src, alt, title, category, wide, visible, sort_order, created_at)
+            VALUES (?,?,?,?,?,?,?,?,?)`,
+      args: [item.id, item.src, item.alt, item.title, item.category, item.wide ? 1 : 0, item.visible ? 1 : 0, item.order, item.createdAt],
+    })
+  }
+}
+
+// ─── Portfolio seed data ──────────────────────────────────────────────────────
+
+const PORTFOLIO_SEED: PortfolioItem[] = [
+  { id: 'arr1',  src: '/images/arrangements.PNG',      alt: 'Floral arrangement',      title: 'Garden Collection',      category: 'arrangements', wide: true,  visible: true, order: 0,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr2',  src: '/images/arrangements2.PNG',     alt: 'Seasonal arrangement',     title: 'Spring Blooms',          category: 'arrangements', wide: false, visible: true, order: 1,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'pe1',   src: '/images/private_event.PNG',     alt: 'Private event florals',    title: 'Spring Celebration',     category: 'events',       wide: false, visible: true, order: 2,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr3',  src: '/images/arrangements3.PNG',     alt: 'Floral arrangement',       title: 'Botanica Series',        category: 'arrangements', wide: false, visible: true, order: 3,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr4',  src: '/images/arrangements4.PNG',     alt: 'Floral arrangement',       title: 'Wildflower Edit',        category: 'arrangements', wide: false, visible: true, order: 4,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'pe3',   src: '/images/private_event3.PNG',    alt: 'Private event design',     title: 'Intimate Dinner',        category: 'events',       wide: true,  visible: true, order: 5,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'pe4',   src: '/images/private_event4.PNG',    alt: 'Event florals',            title: 'Birthday Soirée',        category: 'events',       wide: false, visible: true, order: 6,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr5',  src: '/images/arrangements5.PNG',     alt: 'Floral arrangement',       title: 'Fresh Cut Collection',   category: 'arrangements', wide: false, visible: true, order: 7,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr6',  src: '/images/arrangements6.PNG',     alt: 'Floral arrangement',       title: 'Signature Studio',       category: 'arrangements', wide: true,  visible: true, order: 8,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr7',  src: '/images/arrangements7.PNG',     alt: 'Floral arrangement',       title: 'Seasonal Edit',          category: 'arrangements', wide: true,  visible: true, order: 9,  createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'pe5',   src: '/images/private_event5.PNG',    alt: 'Private event',            title: 'Summer Gathering',       category: 'events',       wide: false, visible: true, order: 10, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr8',  src: '/images/arrangements8.PNG',     alt: 'Floral arrangement',       title: 'Pastel Dreams',          category: 'arrangements', wide: false, visible: true, order: 11, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'arr9',  src: '/images/arrangements9.PNG',     alt: 'Floral arrangement',       title: 'Studio Arrangement',     category: 'arrangements', wide: false, visible: true, order: 12, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'pe7',   src: '/images/private_event7.PNG',    alt: 'Private event',            title: 'Evening Reception',      category: 'events',       wide: false, visible: true, order: 13, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'ren1',  src: '/images/rental.PNG',            alt: 'Floral backdrop rental',   title: 'Floral Wall',            category: 'rentals',      wide: true,  visible: true, order: 14, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'ren2',  src: '/images/rental2.PNG',           alt: 'Backdrop rental setup',    title: 'Floral Backdrop Rental', category: 'rentals',      wide: false, visible: true, order: 15, createdAt: '2025-01-01T00:00:00.000Z' },
+  { id: 'ren3',  src: '/images/rental3.jpeg',          alt: 'Garden backdrop rental',   title: 'Garden Backdrop',        category: 'rentals',      wide: false, visible: true, order: 16, createdAt: '2025-01-01T00:00:00.000Z' },
+]
