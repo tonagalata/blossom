@@ -6,6 +6,9 @@ const links = [
   { href: '/admin/portfolio', label: 'Portfolio' },
   { href: '/admin/images', label: 'Images' },
   { href: '/admin/site-content', label: 'Site Content' },
+  { href: '/admin/inquiries', label: 'Inquiries' },
+  { href: '/admin/payments', label: 'Payments' },
+  { href: '/admin/members', label: 'Members' },
 ]
 
 export default function AdminNav() {

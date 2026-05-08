@@ -20,6 +20,10 @@
 
   --nav-height: 80px;
   --transition: 0.3s ease;
+
+  --dark: #1E1E1A;
+  --muted: #6A6A60;
+  --accent: #B8946A;
 }
 
 html {
@@ -309,6 +313,17 @@ button {
   color: var(--white);
 }
 
+.link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
+}
+
+.link:hover {
+  text-decoration-color: currentColor;
+}
+
 .btn-light {
   border-color: var(--white);
   color: var(--white);
@@ -580,6 +595,7 @@ footer {
   padding: 64px 48px 36px;
   text-align: center;
   border-bottom: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
 
 .page-header .section-title {
@@ -887,6 +903,196 @@ footer {
   color: var(--text-light);
   font-weight: 300;
   margin-top: -10px;
+}
+
+/* ===== Form file upload ===== */
+.form-file-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 2px dashed var(--border);
+  padding: 28px 24px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: var(--text-mid);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-file-zone:hover {
+  border-color: var(--gold);
+  background: #faf6f0;
+}
+
+.form-file-icon {
+  font-size: 1.4rem;
+  color: var(--text-light);
+}
+
+.form-file-hint {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+.form-file-list {
+  list-style: none;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-file-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--text-mid);
+  background: var(--bg-warm);
+  padding: 6px 12px;
+}
+
+.form-file-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 0.75rem;
+  padding: 0 0 0 10px;
+  transition: color 0.2s;
+}
+
+.form-file-remove:hover { color: var(--text); }
+
+.form-error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  font-weight: 300;
+  padding: 10px 14px;
+  background: #fdf2f2;
+  border: 1px solid #e8b4b4;
+}
+
+/* ===== Payment page ===== */
+.pay-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.pay-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 480px;
+  padding: 48px;
+}
+
+.pay-brand {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 32px;
+  letter-spacing: 0.02em;
+}
+
+.pay-details { margin-bottom: 24px; }
+
+.pay-client {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+
+.pay-description {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.pay-amount {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1;
+}
+
+.pay-divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 28px;
+}
+
+.pay-form { display: flex; flex-direction: column; gap: 16px; }
+
+.pay-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 0.8rem;
+}
+
+.pay-error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  padding: 10px 14px;
+  background: #fdf2f2;
+  border: 1px solid #e8b4b4;
+}
+
+.pay-loading {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  font-weight: 300;
+  text-align: center;
+}
+
+.pay-secure {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text-light);
+  letter-spacing: 0.06em;
+  margin-top: 20px;
+}
+
+.pay-status-box {
+  text-align: center;
+  padding: 64px 48px;
+}
+
+.pay-status-icon {
+  font-size: 2rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.pay-status-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.pay-status-body {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.75;
 }
 
 /* ===== Hamburger ===== */
@@ -1226,5 +1432,464 @@ footer {
 
   .next-steps {
     padding: 28px 24px;
+  }
+}
+
+/* ─── Membership plans page ──────────────────────────────────────────────────── */
+
+.membership-empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--muted);
+}
+
+.plans-section {
+  padding: 48px 24px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.plan-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s;
+}
+
+.plan-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+}
+
+.plan-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.plan-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--dark);
+  line-height: 1;
+}
+
+.plan-amount::before {
+  content: '$';
+  font-size: 1.25rem;
+  vertical-align: top;
+  margin-top: 6px;
+  display: inline-block;
+}
+
+.plan-interval {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.plan-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.plan-feature {
+  display: flex;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+
+.plan-check {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.plan-cta {
+  margin-top: auto;
+  text-align: center;
+}
+
+.membership-login-hint {
+  text-align: center;
+  padding: 0 24px 64px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ─── Auth pages ─────────────────────────────────────────────────────────────── */
+
+.auth-page {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.auth-form {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0;
+}
+
+.auth-submit {
+  width: 100%;
+  text-align: center;
+}
+
+.auth-alt {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.form-success {
+  background: #f0faf0;
+  border: 1px solid #a3d9a5;
+  color: #2e7d32;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ─── Member portal ──────────────────────────────────────────────────────────── */
+
+.member-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.member-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 32px;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.member-nav-brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.member-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.member-nav-link {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.member-nav-link:hover,
+.member-nav-link.active {
+  color: var(--dark);
+  background: #f5f5f5;
+}
+
+.member-nav-link-sm {
+  font-size: 0.85rem;
+}
+
+.member-logout-btn {
+  color: #c62828;
+}
+
+.member-logout-btn:hover {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.member-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 1px solid #e8e8e8;
+  padding-left: 16px;
+  margin-left: 8px;
+}
+
+.member-main {
+  flex: 1;
+  padding: 40px 32px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.member-page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0 0 32px;
+}
+
+.member-loading {
+  color: var(--muted);
+  padding: 48px 32px;
+}
+
+.member-empty {
+  color: var(--muted);
+}
+
+.member-dashboard .member-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.member-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.member-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+}
+
+.member-card-detail {
+  font-size: 0.95rem;
+  color: var(--dark);
+  margin: 0;
+}
+
+.member-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.member-status-badge[data-status="active"]     { background: #e8f5e9; color: #2e7d32; }
+.member-status-badge[data-status="trialing"]   { background: #e3f2fd; color: #1565c0; }
+.member-status-badge[data-status="past_due"]   { background: #fff3e0; color: #e65100; }
+.member-status-badge[data-status="canceled"]   { background: #f5f5f5; color: #757575; }
+.member-status-badge[data-status="incomplete"] { background: #fffde7; color: #f57f17; }
+
+.member-portal-btn {
+  align-self: flex-start;
+}
+
+/* member inquiries */
+
+.member-inquiries {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.member-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0 0 16px;
+}
+
+.member-inquiry-form-wrap {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 28px 24px;
+}
+
+.member-inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.member-inquiry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.member-inquiry-item {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-inquiry-item.status-replied {
+  border-left: 3px solid var(--accent);
+}
+
+.member-inquiry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.member-inquiry-status {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: #f5f5f5;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.member-inquiry-item.status-replied .member-inquiry-status {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.member-inquiry-body {
+  margin: 0;
+  color: var(--dark);
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
+.member-inquiry-date {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.member-inquiry-reply {
+  margin-top: 8px;
+  padding: 14px 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.member-inquiry-reply-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ─── Account page ───────────────────────────────────────────────────────────── */
+
+.member-account {
+  max-width: 480px;
+}
+
+.member-account-section {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 28px 24px;
+}
+
+.member-account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .auth-form {
+    padding: 36px 24px;
+  }
+
+  .member-main {
+    padding: 24px 16px;
+  }
+
+  .member-nav {
+    padding: 0 16px;
+    gap: 12px;
   }
 }

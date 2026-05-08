@@ -192,6 +192,25 @@ export async function deleteUploadedImage(filename: string): Promise<void> {
   }
 }
 
+// ─── Stripe config ───────────────────────────────────────────────────────────
+
+import type { StripeConfig } from './types'
+
+export async function getStripeConfig(): Promise<StripeConfig | null> {
+  if (IS_NETLIFY) {
+    return blobGet<StripeConfig>('stripe', 'config')
+  }
+  return localRead<StripeConfig | null>('stripe-config.json', null)
+}
+
+export async function saveStripeConfig(config: StripeConfig): Promise<void> {
+  if (IS_NETLIFY) {
+    await blobSet('stripe', 'config', config)
+  } else {
+    await localWrite('stripe-config.json', config)
+  }
+}
+
 // ─── Built-in image list (from public/images/) ───────────────────────────────
 
 export async function listBuiltinImages(): Promise<string[]> {

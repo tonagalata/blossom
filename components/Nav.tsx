@@ -36,6 +36,7 @@ export default function Nav() {
           <li><Link href="/" className={active('/')}>Home</Link></li>
           <li><Link href="/portfolio" className={active('/portfolio')}>Portfolio</Link></li>
           <li><Link href="/inquiry" className={active('/inquiry')}>Inquire</Link></li>
+          <li><Link href="/membership" className={active('/membership')}>Membership</Link></li>
           <li><Link href="/#about">About</Link></li>
         </ul>
         <Link href="/inquiry" className="nav-cta">Book Now</Link>
@@ -54,6 +55,7 @@ export default function Nav() {
           <li><Link href="/" onClick={close}>Home</Link></li>
           <li><Link href="/portfolio" onClick={close}>Portfolio</Link></li>
           <li><Link href="/inquiry" onClick={close}>Inquire</Link></li>
+          <li><Link href="/membership" onClick={close}>Membership</Link></li>
         </ul>
         <Link href="/inquiry" className="btn mobile-book-btn" onClick={close}>Book Now</Link>
       </div>
