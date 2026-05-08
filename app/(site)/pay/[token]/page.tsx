@@ -33,6 +33,8 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
     const stripe = await getStripeClient()
 
     const REUSABLE = ['requires_payment_method', 'requires_confirmation', 'requires_action']
+    // Determine current mode from the secret key so we can detect stale intents
+    const liveMode = process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_') ?? false
 
     async function freshIntent() {
       const pi = await stripe.paymentIntents.create({
@@ -50,7 +52,10 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
     if (req.stripe_payment_intent_id) {
       try {
         const pi = await stripe.paymentIntents.retrieve(req.stripe_payment_intent_id)
-        clientSecret = REUSABLE.includes(pi.status) ? pi.client_secret! : await freshIntent()
+        // Discard intent if it's from the wrong Stripe mode (test vs live)
+        const intentIsLive = !pi.id.includes('_test_')
+        const modeMatch = liveMode === intentIsLive
+        clientSecret = (modeMatch && REUSABLE.includes(pi.status)) ? pi.client_secret! : await freshIntent()
       } catch {
         clientSecret = await freshIntent()
       }

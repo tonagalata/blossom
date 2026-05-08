@@ -1,28 +1,19 @@
 import Stripe from 'stripe'
-import { getStripeConfig } from './store'
+
+function requireEnv(name: string): string {
+  const val = process.env[name]
+  if (!val) throw new Error(`${name} is not set. Add it to your environment variables.`)
+  return val
+}
 
 export async function getStripeClient(): Promise<Stripe> {
-  const envKey = process.env.STRIPE_SECRET_KEY
-  if (envKey) return new Stripe(envKey)
-
-  const config = await getStripeConfig()
-  if (!config?.secretKey) throw new Error('Stripe is not configured. Add your keys in Admin → Payments.')
-  return new Stripe(config.secretKey)
+  return new Stripe(requireEnv('STRIPE_SECRET_KEY'))
 }
 
 export async function getPublishableKey(): Promise<string> {
-  const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  if (envKey) return envKey
-
-  const config = await getStripeConfig()
-  if (!config?.publishableKey) throw new Error('Stripe is not configured.')
-  return config.publishableKey
+  return requireEnv('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY')
 }
 
 export async function getWebhookSecret(): Promise<string | null> {
-  const envKey = process.env.STRIPE_WEBHOOK_SECRET
-  if (envKey) return envKey
-
-  const config = await getStripeConfig()
-  return config?.webhookSecret ?? null
+  return process.env.STRIPE_WEBHOOK_SECRET ?? null
 }
