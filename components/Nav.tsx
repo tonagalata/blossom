@@ -1,13 +1,19 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 export default function Nav() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [signedIn, setSignedIn] = useState(false)
 
   const active = (href: string) => pathname === href ? 'active' : undefined
+
+  useEffect(() => {
+    fetch('/api/members/me').then(r => setSignedIn(r.ok)).catch(() => {})
+  }, [pathname])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
@@ -21,6 +27,17 @@ export default function Nav() {
   }, [open])
 
   const close = () => setOpen(false)
+
+  async function handleLogout() {
+    await fetch('/api/members/logout', { method: 'POST' })
+    setSignedIn(false)
+    close()
+    router.push('/')
+  }
+
+  const memberLink = signedIn
+    ? { href: '/members', label: 'My Account' }
+    : { href: '/membership', label: 'Membership' }
 
   return (
     <>
@@ -36,8 +53,13 @@ export default function Nav() {
           <li><Link href="/" className={active('/')}>Home</Link></li>
           <li><Link href="/portfolio" className={active('/portfolio')}>Portfolio</Link></li>
           <li><Link href="/inquiry" className={active('/inquiry')}>Inquire</Link></li>
-          <li><Link href="/membership" className={active('/membership')}>Membership</Link></li>
+          <li><Link href={memberLink.href} className={active(memberLink.href)}>{memberLink.label}</Link></li>
           <li><Link href="/#about">About</Link></li>
+          {signedIn && (
+            <li>
+              <button className="nav-logout-btn" onClick={handleLogout}>Sign Out</button>
+            </li>
+          )}
         </ul>
         <Link href="/inquiry" className="nav-cta">Book Now</Link>
         <button className="nav-hamburger" onClick={() => setOpen(true)} aria-label="Open menu">
@@ -55,7 +77,8 @@ export default function Nav() {
           <li><Link href="/" onClick={close}>Home</Link></li>
           <li><Link href="/portfolio" onClick={close}>Portfolio</Link></li>
           <li><Link href="/inquiry" onClick={close}>Inquire</Link></li>
-          <li><Link href="/membership" onClick={close}>Membership</Link></li>
+          <li><Link href={memberLink.href} onClick={close}>{memberLink.label}</Link></li>
+          {signedIn && <li><button className="mobile-nav-logout" onClick={handleLogout}>Sign Out</button></li>}
         </ul>
         <Link href="/inquiry" className="btn mobile-book-btn" onClick={close}>Book Now</Link>
       </div>

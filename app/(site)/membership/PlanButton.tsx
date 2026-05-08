@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function PlanButton({ planId }: { planId: string }) {
   const router = useRouter()
@@ -39,5 +40,22 @@ export default function PlanButton({ planId }: { planId: string }) {
     <button className="btn plan-cta" onClick={handleClick} disabled={loading || signedIn === null}>
       {loading ? 'Loading…' : 'Get Started'}
     </button>
+  )
+}
+
+export function MembershipHint() {
+  const [signedIn, setSignedIn] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    fetch('/api/members/me').then(r => setSignedIn(r.ok)).catch(() => setSignedIn(false))
+  }, [])
+
+  if (signedIn === null || signedIn) return null
+
+  return (
+    <div className="membership-login-hint">
+      Already a member?{' '}
+      <Link href="/members/login" className="link">Sign in</Link>
+    </div>
   )
 }

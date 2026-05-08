@@ -16,6 +16,10 @@ function SignupForm() {
   const searchParams = useSearchParams()
   const planIdParam = searchParams.get('plan') || ''
 
+  useEffect(() => {
+    fetch('/api/members/me').then(r => { if (r.ok) router.replace('/members') }).catch(() => {})
+  }, [router])
+
   const [plans, setPlans] = useState<Plan[]>([])
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')

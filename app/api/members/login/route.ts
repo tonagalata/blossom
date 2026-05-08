@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { getMemberByEmail } from '@/lib/db'
-import { signMemberToken, MEMBER_COOKIE } from '@/lib/memberAuth'
+import { signMemberToken, MEMBER_COOKIE, SESSION_MAX_AGE } from '@/lib/memberAuth'
 
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json() as Record<string, string>
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: SESSION_MAX_AGE,
   })
   return res
 }

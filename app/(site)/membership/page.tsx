@@ -1,6 +1,5 @@
-import Link from 'next/link'
 import { listPlans } from '@/lib/db'
-import PlanButton from './PlanButton'
+import PlanButton, { MembershipHint } from './PlanButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,10 +51,7 @@ export default async function MembershipPage() {
         </section>
       )}
 
-      <div className="membership-login-hint">
-        Already a member?{' '}
-        <Link href="/members/login" className="link">Sign in</Link>
-      </div>
+      <MembershipHint />
     </>
   )
 }

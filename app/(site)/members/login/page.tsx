@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
@@ -9,6 +9,10 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/members'
   const justReset = searchParams.get('reset') === '1'
+
+  useEffect(() => {
+    fetch('/api/members/me').then(r => { if (r.ok) router.replace('/members') }).catch(() => {})
+  }, [router])
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

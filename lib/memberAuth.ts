@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 
 export const MEMBER_COOKIE = 'member-session'
+export const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 
 function getSecret() {
   return new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || 'dev-secret-change-me-in-production-32ch')
@@ -10,7 +11,7 @@ export async function signMemberToken(memberId: string, email: string): Promise<
   return new SignJWT({ memberId, email, role: 'member' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('30d')
+    .setExpirationTime('7d')
     .sign(getSecret())
 }
 
