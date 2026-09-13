@@ -35,13 +35,18 @@ export default function SiteContentAdmin() {
 
   async function save(updated: SiteConfig) {
     setSaving(true)
-    await fetch('/api/admin/site-config', {
+    const res = await fetch('/api/admin/site-config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated),
     })
     setSaving(false)
-    showToast('Saved')
+    if (res.ok) {
+      showToast('Saved')
+    } else {
+      const data = await res.json().catch(() => null)
+      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+    }
   }
 
   function pickImage(src: string) {

@@ -29,13 +29,18 @@ export default function AboutContentAdmin() {
   async function save() {
     if (!content) return
     setSaving(true)
-    await fetch('/api/admin/about-content', {
+    const res = await fetch('/api/admin/about-content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(content),
     })
     setSaving(false)
-    showToast('Saved')
+    if (res.ok) {
+      showToast('Saved')
+    } else {
+      const data = await res.json().catch(() => null)
+      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+    }
   }
 
   function pickImage(src: string) {

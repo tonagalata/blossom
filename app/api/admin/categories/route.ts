@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/requireAdmin'
 import { getCategories, saveCategories } from '@/lib/store'
+import { adminApiError } from '@/lib/apiError'
 import type { PortfolioCategory } from '@/lib/types'
 
 export async function GET() {
@@ -13,7 +14,11 @@ export async function PUT(request: NextRequest) {
   const err = await requireAdmin()
   if (err) return err
 
-  const categories = await request.json() as PortfolioCategory[]
-  await saveCategories(categories)
-  return NextResponse.json(categories)
+  try {
+    const categories = await request.json() as PortfolioCategory[]
+    await saveCategories(categories)
+    return NextResponse.json(categories)
+  } catch (e) {
+    return adminApiError('save categories', e)
+  }
 }

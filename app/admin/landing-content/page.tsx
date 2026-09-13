@@ -23,13 +23,18 @@ export default function LandingContentAdmin() {
   async function save() {
     if (!content) return
     setSaving(true)
-    await fetch('/api/admin/landing-content', {
+    const res = await fetch('/api/admin/landing-content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(content),
     })
     setSaving(false)
-    showToast('Saved')
+    if (res.ok) {
+      showToast('Saved')
+    } else {
+      const data = await res.json().catch(() => null)
+      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+    }
   }
 
   if (loading) return <div className="admin-loading">Loading…</div>

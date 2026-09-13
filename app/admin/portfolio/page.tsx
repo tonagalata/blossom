@@ -43,13 +43,18 @@ export default function PortfolioAdmin() {
   async function saveCategories(next: PortfolioCategory[]) {
     setSavingCategories(true)
     setCategories(next)
-    await fetch('/api/admin/categories', {
+    const res = await fetch('/api/admin/categories', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(next),
     })
     setSavingCategories(false)
-    showToast('Categories saved')
+    if (res.ok) {
+      showToast('Categories saved')
+    } else {
+      const data = await res.json().catch(() => null)
+      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+    }
   }
 
   function addCategory() {

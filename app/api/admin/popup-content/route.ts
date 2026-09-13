@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/requireAdmin'
 import { getPopupContent, savePopupContent } from '@/lib/store'
+import { adminApiError } from '@/lib/apiError'
 import type { PopupContent } from '@/lib/types'
 
 export async function GET() {
@@ -13,7 +14,11 @@ export async function PUT(request: NextRequest) {
   const err = await requireAdmin()
   if (err) return err
 
-  const content = await request.json() as PopupContent
-  await savePopupContent(content)
-  return NextResponse.json(content)
+  try {
+    const content = await request.json() as PopupContent
+    await savePopupContent(content)
+    return NextResponse.json(content)
+  } catch (e) {
+    return adminApiError('save popup content', e)
+  }
 }
