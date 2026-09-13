@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import type { PortfolioItem, SiteConfig } from './types'
+import type { PortfolioItem, SiteConfig, PortfolioCategory, LandingContent, PopupContent, AboutPageContent } from './types'
 
 // NETLIFY=true is set during both build AND runtime on Netlify.
 // Blobs only work at runtime (not during the build phase), so every blob
@@ -101,22 +101,26 @@ export async function savePortfolioItems(items: PortfolioItem[]): Promise<void> 
 // ─── Site config ─────────────────────────────────────────────────────────────
 
 const DEFAULT_CONFIG: SiteConfig = {
-  heroImage: '/images/arrangements7.PNG',
-  aboutImage: '/images/arrangements2.PNG',
   previewImages: [
     '/images/arrangements.PNG',
     '/images/private_event.PNG',
     '/images/arrangements2.PNG',
     '/images/private_event8.PNG',
   ],
+  heroSlides: [
+    { type: 'image', src: '/images/arrangements7.PNG' },
+  ],
+  heroSlideDuration: 6,
   updatedAt: new Date().toISOString(),
 }
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   if (IS_NETLIFY) {
-    return (await blobGet<SiteConfig>('site-config', 'config')) ?? DEFAULT_CONFIG
+    const saved = await blobGet<SiteConfig>('site-config', 'config')
+    return saved ? { ...DEFAULT_CONFIG, ...saved } : DEFAULT_CONFIG
   }
-  return localRead<SiteConfig>('site-config.json', DEFAULT_CONFIG)
+  const saved = await localRead<SiteConfig | null>('site-config.json', null)
+  return saved ? { ...DEFAULT_CONFIG, ...saved } : DEFAULT_CONFIG
 }
 
 export async function saveSiteConfig(config: SiteConfig): Promise<void> {
@@ -124,6 +128,142 @@ export async function saveSiteConfig(config: SiteConfig): Promise<void> {
     await blobSet('site-config', 'config', config)
   } else {
     await localWrite('site-config.json', config)
+  }
+}
+
+// ─── Portfolio categories ─────────────────────────────────────────────────────
+
+const DEFAULT_CATEGORIES: PortfolioCategory[] = [
+  { value: 'arrangements', label: 'Floral Arrangements' },
+  { value: 'events', label: 'Private Events' },
+  { value: 'rentals', label: 'Backdrop Rentals' },
+]
+
+export async function getCategories(): Promise<PortfolioCategory[]> {
+  if (IS_NETLIFY) {
+    return (await blobGet<PortfolioCategory[]>('categories', 'list')) ?? DEFAULT_CATEGORIES
+  }
+  return localRead<PortfolioCategory[]>('categories.json', DEFAULT_CATEGORIES)
+}
+
+export async function saveCategories(categories: PortfolioCategory[]): Promise<void> {
+  if (IS_NETLIFY) {
+    await blobSet('categories', 'list', categories)
+  } else {
+    await localWrite('categories.json', categories)
+  }
+}
+
+// ─── Landing page content ─────────────────────────────────────────────────────
+
+const DEFAULT_LANDING_CONTENT: LandingContent = {
+  hero: {
+    subtitle: 'Floral & Event Styling · Bethesda & the DMV',
+    buttonLabel: 'Request a Quote',
+  },
+  about: {
+    eyebrow: 'Our Story',
+    title: 'Blooms that tell your story',
+    body: 'Every arrangement is composed with intention: unexpected color, seasonal texture, and a genuine love for the craft that shows in every stem.',
+    ctaLabel: 'Start Planning',
+  },
+  services: {
+    heading: 'Thoughtfully styled, just for you.',
+    items: [
+      { title: 'Wedding Florals', desc: 'From intimate gatherings to grand celebrations, we create florals that tell your love story.' },
+      { title: 'Celebrations & Tablescapes', desc: "Elevated floral design for life's special moments — showers, birthdays, dinners and more." },
+      { title: 'Bouquets', desc: 'Hand-tied blooms for every occasion, designed with beauty, intention and care.' },
+    ],
+  },
+  gallery: {
+    heading: 'A glimpse of our work',
+  },
+  testimonial: {
+    quote: 'The floral arrangements were fresh, elegant, and brought the whole space to life.',
+    attribution: 'Leah L. · Thumbtack',
+  },
+  testimonials: [
+    { quote: 'Every detail was handled with such care. Our wedding florals were beyond what we imagined.', attribution: 'Sarah M. · Google' },
+    { quote: 'The table arrangements for our dinner party were stunning. Guests could not stop complimenting them.', attribution: 'Diana K. · Yelp' },
+    { quote: 'My bridal bouquet was absolutely perfect — exactly the romantic, lush look I had always envisioned.', attribution: 'Priya R. · Thumbtack' },
+  ],
+  cta: {
+    heading: "Let's bring your celebration to life.",
+    buttonLabel: 'Tell Us About Your Event',
+  },
+}
+
+export async function getLandingContent(): Promise<LandingContent> {
+  if (IS_NETLIFY) {
+    const saved = await blobGet<LandingContent>('landing-content', 'content')
+    return saved ? { ...DEFAULT_LANDING_CONTENT, ...saved } : DEFAULT_LANDING_CONTENT
+  }
+  const saved = await localRead<LandingContent | null>('landing-content.json', null)
+  return saved ? { ...DEFAULT_LANDING_CONTENT, ...saved } : DEFAULT_LANDING_CONTENT
+}
+
+export async function saveLandingContent(content: LandingContent): Promise<void> {
+  if (IS_NETLIFY) {
+    await blobSet('landing-content', 'content', content)
+  } else {
+    await localWrite('landing-content.json', content)
+  }
+}
+
+// ─── Popup content ────────────────────────────────────────────────────────────
+
+const DEFAULT_POPUP_CONTENT: PopupContent = {
+  eyebrow: "let's work together",
+  title: 'What brings you here?',
+  body: "Whether you're planning an event, ordering florals, or exploring a membership, we'd love to help.",
+  image: '/images/arrangements5.PNG',
+  options: [
+    { value: 'Event Inquiry', label: 'Book an Event' },
+    { value: 'Floral Order', label: 'Place a Floral Order' },
+    { value: 'Membership Interest', label: 'Learn About Membership' },
+  ],
+}
+
+export async function getPopupContent(): Promise<PopupContent> {
+  if (IS_NETLIFY) {
+    return (await blobGet<PopupContent>('popup-content', 'content')) ?? DEFAULT_POPUP_CONTENT
+  }
+  return localRead<PopupContent>('popup-content.json', DEFAULT_POPUP_CONTENT)
+}
+
+export async function savePopupContent(content: PopupContent): Promise<void> {
+  if (IS_NETLIFY) {
+    await blobSet('popup-content', 'content', content)
+  } else {
+    await localWrite('popup-content.json', content)
+  }
+}
+
+// ─── About page content ───────────────────────────────────────────────────────
+
+const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
+  eyebrow: 'About Us',
+  title: 'About Events in Bloom Co.',
+  body1: 'Events in Bloom Co. creates elegant custom florals for birthdays, graduations, bridal showers, baby showers, private afternoon teas, dinner parties, intimate weddings, and special celebrations across Bethesda and the DMV.',
+  body2: 'We specialize in custom centerpieces, bouquets, table florals, and thoughtful event styling designed around your vision, color palette, and budget. From intimate afternoon tea gatherings to full celebration setups, we create polished designs that feel personal, beautiful, and memorable.',
+  image: '/images/arrangements2.PNG',
+  ctaLabel: 'Start Planning',
+}
+
+export async function getAboutPageContent(): Promise<AboutPageContent> {
+  if (IS_NETLIFY) {
+    const saved = await blobGet<AboutPageContent>('about-content', 'content')
+    return saved ? { ...DEFAULT_ABOUT_CONTENT, ...saved } : DEFAULT_ABOUT_CONTENT
+  }
+  const saved = await localRead<AboutPageContent | null>('about-content.json', null)
+  return saved ? { ...DEFAULT_ABOUT_CONTENT, ...saved } : DEFAULT_ABOUT_CONTENT
+}
+
+export async function saveAboutPageContent(content: AboutPageContent): Promise<void> {
+  if (IS_NETLIFY) {
+    await blobSet('about-content', 'content', content)
+  } else {
+    await localWrite('about-content.json', content)
   }
 }
 
@@ -215,6 +355,20 @@ export async function listBuiltinImages(): Promise<string[]> {
     return files
       .filter(f => /\.(png|jpe?g|gif|webp)$/i.test(f))
       .map(f => `/images/${f}`)
+  } catch {
+    return []
+  }
+}
+
+// ─── Built-in video list (from public/videos/) ────────────────────────────────
+
+export async function listBuiltinVideos(): Promise<string[]> {
+  const dir = path.join(process.cwd(), 'public', 'videos')
+  try {
+    const files = await fs.readdir(dir)
+    return files
+      .filter(f => /\.(mp4|mov|webm|ogg)$/i.test(f))
+      .map(f => `/videos/${f}`)
   } catch {
     return []
   }

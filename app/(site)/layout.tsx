@@ -1,10 +1,17 @@
 import Nav from '@/components/Nav'
+import IntentModal from '@/components/IntentModal'
+import { getPopupContent } from '@/lib/store'
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export const dynamic = 'force-dynamic'
+
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const popupContent = await getPopupContent()
+
   return (
     <>
       <Nav />
       {children}
+      <IntentModal content={popupContent} />
     </>
   )
 }

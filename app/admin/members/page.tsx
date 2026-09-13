@@ -51,6 +51,12 @@ export default function AdminMembersPage() {
   const [planError, setPlanError] = useState('')
   const [showPlanForm, setShowPlanForm] = useState(false)
 
+  // plan edit
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({ name: '', description: '', features: '', sortOrder: '0' })
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState('')
+
   // inquiry reply
   const [replyingId, setReplyingId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
@@ -97,6 +103,47 @@ export default function AdminMembersPage() {
       setPlanError('Something went wrong.')
     } finally {
       setPlanSaving(false)
+    }
+  }
+
+  function startEdit(plan: Plan) {
+    setEditingPlanId(plan.id)
+    setEditError('')
+    setEditForm({
+      name: plan.name,
+      description: plan.description ?? '',
+      features: plan.features.join('\n'),
+      sortOrder: String(plan.sort_order),
+    })
+  }
+
+  function cancelEdit() {
+    setEditingPlanId(null)
+    setEditError('')
+  }
+
+  async function saveEdit(id: string) {
+    if (!editForm.name.trim()) { setEditError('Name is required.'); return }
+    setEditError('')
+    setEditSaving(true)
+    try {
+      const res = await fetch(`/api/admin/plans/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description,
+          features: editForm.features ? editForm.features.split('\n').map(s => s.trim()).filter(Boolean) : [],
+          sort_order: parseInt(editForm.sortOrder) || 0,
+        }),
+      })
+      if (!res.ok) { setEditError('Failed to save changes.'); return }
+      setEditingPlanId(null)
+      await loadAll()
+    } catch {
+      setEditError('Something went wrong.')
+    } finally {
+      setEditSaving(false)
     }
   }
 
@@ -215,37 +262,78 @@ export default function AdminMembersPage() {
                 <div className="admin-plan-list">
                   {plans.map(plan => (
                     <div key={plan.id} className={`admin-plan-card${!plan.active ? ' inactive' : ''}`}>
-                      <div className="admin-plan-header">
-                        <div>
-                          <strong>{plan.name}</strong>
-                          {!plan.active && <span className="admin-plan-inactive-badge">Inactive</span>}
+                      {editingPlanId === plan.id ? (
+                        <div className="admin-form">
+                          {editError && <p className="form-error">{editError}</p>}
+                          <div className="form-row">
+                            <div className="form-group">
+                              <label className="form-label">Name</label>
+                              <input className="form-input" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} required />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label">Sort Order</label>
+                              <input type="number" className="form-input" value={editForm.sortOrder} onChange={e => setEditForm(f => ({ ...f, sortOrder: e.target.value }))} />
+                            </div>
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">Description</label>
+                            <input className="form-input" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">Features (one per line)</label>
+                            <textarea className="form-input form-textarea" rows={4} value={editForm.features} onChange={e => setEditForm(f => ({ ...f, features: e.target.value }))} />
+                          </div>
                           <p className="admin-plan-price">
-                            ${(plan.amount / 100).toFixed(2)}/{plan.interval}
+                            ${(plan.amount / 100).toFixed(2)}/{plan.interval} — price &amp; interval can&apos;t be changed here since they&apos;re tied to Stripe; delete and recreate the plan to change them.
                           </p>
+                          <div className="admin-reply-actions">
+                            <button className="btn" onClick={() => saveEdit(plan.id)} disabled={editSaving}>
+                              {editSaving ? 'Saving…' : 'Save Changes'}
+                            </button>
+                            <button className="admin-btn-sm" onClick={cancelEdit}>Cancel</button>
+                          </div>
                         </div>
-                        <div className="admin-plan-actions">
-                          <button
-                            className="admin-btn-sm"
-                            onClick={() => togglePlanActive(plan)}
-                          >
-                            {plan.active ? 'Deactivate' : 'Activate'}
-                          </button>
-                          <button
-                            className="admin-btn-sm admin-btn-danger"
-                            onClick={() => deletePlan(plan.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                      {plan.description && <p className="admin-plan-desc">{plan.description}</p>}
-                      {plan.features.length > 0 && (
-                        <ul className="admin-plan-features">
-                          {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
-                        </ul>
-                      )}
-                      {plan.stripe_price_id && (
-                        <p className="admin-plan-stripe-id">Stripe: {plan.stripe_price_id}</p>
+                      ) : (
+                        <>
+                          <div className="admin-plan-header">
+                            <div>
+                              <strong>{plan.name}</strong>
+                              {!plan.active && <span className="admin-plan-inactive-badge">Inactive</span>}
+                              <p className="admin-plan-price">
+                                ${(plan.amount / 100).toFixed(2)}/{plan.interval}
+                              </p>
+                            </div>
+                            <div className="admin-plan-actions">
+                              <button
+                                className="admin-btn-sm"
+                                onClick={() => startEdit(plan)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="admin-btn-sm"
+                                onClick={() => togglePlanActive(plan)}
+                              >
+                                {plan.active ? 'Deactivate' : 'Activate'}
+                              </button>
+                              <button
+                                className="admin-btn-sm admin-btn-danger"
+                                onClick={() => deletePlan(plan.id)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                          {plan.description && <p className="admin-plan-desc">{plan.description}</p>}
+                          {plan.features.length > 0 && (
+                            <ul className="admin-plan-features">
+                              {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
+                            </ul>
+                          )}
+                          {plan.stripe_price_id && (
+                            <p className="admin-plan-stripe-id">Stripe: {plan.stripe_price_id}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   ))}

@@ -1,27 +1,20 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import Footer from '@/components/Footer'
-import type { PortfolioItem, Category } from '@/lib/types'
+import type { PortfolioItem, PortfolioCategory } from '@/lib/types'
 
-type FilterValue = 'all' | Category
+type FilterValue = 'all' | string
 
-const filters: { label: string; value: FilterValue }[] = [
-  { label: 'All',                value: 'all'          },
-  { label: 'Floral Arrangements',value: 'arrangements' },
-  { label: 'Private Events',     value: 'events'       },
-  { label: 'Backdrop Rentals',   value: 'rentals'      },
-]
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  arrangements: 'Floral Arrangements',
-  events:       'Private Events',
-  rentals:      'Backdrop Rentals',
-}
-
-export default function PortfolioClient({ items }: { items: PortfolioItem[] }) {
+export default function PortfolioClient({ items, categories }: { items: PortfolioItem[]; categories: PortfolioCategory[] }) {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+
+  const filters: { label: string; value: FilterValue }[] = [
+    { label: 'All', value: 'all' },
+    ...categories.map(c => ({ label: c.label, value: c.value })),
+  ]
+
+  const categoryLabel = (value: string) => categories.find(c => c.value === value)?.label ?? value
 
   const visible = (activeFilter === 'all'
     ? items
@@ -68,7 +61,7 @@ export default function PortfolioClient({ items }: { items: PortfolioItem[] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.src} alt={item.alt} />
             <div className="portfolio-item-overlay">
-              <span className="portfolio-item-category">{CATEGORY_LABELS[item.category]}</span>
+              <span className="portfolio-item-category">{categoryLabel(item.category)}</span>
               <span className="portfolio-item-title">{item.title}</span>
             </div>
           </div>
@@ -83,8 +76,6 @@ export default function PortfolioClient({ items }: { items: PortfolioItem[] }) {
         </p>
         <Link href="/inquiry" className="btn btn-gold">Get in Touch</Link>
       </section>
-
-      <Footer />
 
       {lightbox && (
         <div

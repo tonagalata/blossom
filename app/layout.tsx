@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Jost } from 'next/font/google'
+import { Libre_Baskerville, Great_Vibes } from 'next/font/google'
 import './globals.css'
 
-const cormorant = Cormorant_Garamond({
+const libreBaskerville = Libre_Baskerville({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
+  weight: ['400', '700'],
   style: ['normal', 'italic'],
   variable: '--font-serif',
 })
 
-const jost = Jost({
+const greatVibes = Great_Vibes({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-sans',
+  weight: '400',
+  variable: '--font-script',
 })
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${jost.variable}`}>
+    <html lang="en" className={`${libreBaskerville.variable} ${greatVibes.variable}`}>
       <body>
         {children}
       </body>

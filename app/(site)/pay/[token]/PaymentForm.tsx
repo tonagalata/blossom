@@ -91,12 +91,13 @@ export default function PaymentForm({ publishableKey, clientSecret, amount, curr
           stripe={stripePromise}
           options={{
             clientSecret,
+            fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap' }],
             appearance: {
               theme: 'stripe',
               variables: {
                 colorPrimary: '#B8946A',
                 colorBackground: '#ffffff',
-                fontFamily: 'Jost, system-ui, sans-serif',
+                fontFamily: '"Libre Baskerville", Georgia, serif',
                 borderRadius: '0px',
               },
             },

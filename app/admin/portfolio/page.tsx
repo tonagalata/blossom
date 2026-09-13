@@ -1,22 +1,23 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import type { PortfolioItem, Category } from '@/lib/types'
+import type { PortfolioItem, PortfolioCategory } from '@/lib/types'
 
-const CATEGORIES: Category[] = ['arrangements', 'events', 'rentals']
-
-function blankItem(): Omit<PortfolioItem, 'id' | 'order' | 'createdAt'> {
-  return { src: '', alt: '', title: '', category: 'arrangements', wide: false, visible: true }
+function blankItem(defaultCategory: string): Omit<PortfolioItem, 'id' | 'order' | 'createdAt'> {
+  return { src: '', alt: '', title: '', category: defaultCategory, wide: false, visible: true }
 }
 
 export default function PortfolioAdmin() {
   const [items, setItems] = useState<PortfolioItem[]>([])
+  const [categories, setCategories] = useState<PortfolioCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingCategories, setSavingCategories] = useState(false)
   const [toast, setToast] = useState('')
   const [showAdd, setShowAdd] = useState(false)
-  const [newItem, setNewItem] = useState(blankItem())
+  const [newItem, setNewItem] = useState(blankItem(''))
   const [images, setImages] = useState<string[]>([])
   const [pickerFor, setPickerFor] = useState<'new' | string | null>(null)
+  const [newCategoryLabel, setNewCategoryLabel] = useState('')
 
   const dragId = useRef<string | null>(null)
 
@@ -29,12 +30,45 @@ export default function PortfolioAdmin() {
     Promise.all([
       fetch('/api/admin/portfolio').then(r => r.json()),
       fetch('/api/admin/images').then(r => r.json()),
-    ]).then(([portfolio, imgs]) => {
+      fetch('/api/admin/categories').then(r => r.json()),
+    ]).then(([portfolio, imgs, cats]) => {
       setItems(portfolio.sort((a: PortfolioItem, b: PortfolioItem) => a.order - b.order))
       setImages([...imgs.uploaded, ...imgs.builtin])
+      setCategories(cats)
+      setNewItem(blankItem(cats[0]?.value ?? ''))
       setLoading(false)
     })
   }, [])
+
+  async function saveCategories(next: PortfolioCategory[]) {
+    setSavingCategories(true)
+    setCategories(next)
+    await fetch('/api/admin/categories', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(next),
+    })
+    setSavingCategories(false)
+    showToast('Categories saved')
+  }
+
+  function addCategory() {
+    const label = newCategoryLabel.trim()
+    if (!label) return
+    const value = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    if (!value || categories.some(c => c.value === value)) return
+    saveCategories([...categories, { value, label }])
+    setNewCategoryLabel('')
+  }
+
+  function renameCategory(value: string, label: string) {
+    saveCategories(categories.map(c => c.value === value ? { ...c, label } : c))
+  }
+
+  function deleteCategory(value: string) {
+    if (!confirm('Delete this category? Portfolio items using it will keep the old value but show unlabeled.')) return
+    saveCategories(categories.filter(c => c.value !== value))
+  }
 
   async function patchItem(id: string, patch: Partial<PortfolioItem>) {
     const updated = items.map(it => it.id === id ? { ...it, ...patch } : it)
@@ -63,7 +97,7 @@ export default function PortfolioAdmin() {
     })
     const created = await res.json()
     setItems(prev => [...prev, created])
-    setNewItem(blankItem())
+    setNewItem(blankItem(categories[0]?.value ?? ''))
     setShowAdd(false)
     setSaving(false)
     showToast('Item added')
@@ -107,6 +141,41 @@ export default function PortfolioAdmin() {
         <button className="admin-btn admin-btn-primary" onClick={() => setShowAdd(true)}>
           + Add Item
         </button>
+      </div>
+
+      <div className="admin-subsection">
+        <h3 className="admin-subsection-title">Categories</h3>
+        <div className="category-manager-list">
+          {categories.map(c => (
+            <div key={c.value} className="category-manager-row">
+              <input
+                className="admin-input"
+                value={c.label}
+                onChange={e => setCategories(prev => prev.map(cat => cat.value === c.value ? { ...cat, label: e.target.value } : cat))}
+                onBlur={e => renameCategory(c.value, e.target.value)}
+              />
+              <button
+                className="admin-btn admin-btn-danger admin-btn-sm"
+                onClick={() => deleteCategory(c.value)}
+                disabled={savingCategories}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="category-manager-add">
+          <input
+            className="admin-input"
+            value={newCategoryLabel}
+            onChange={e => setNewCategoryLabel(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCategory() } }}
+            placeholder="New category name"
+          />
+          <button className="admin-btn admin-btn-sm" onClick={addCategory} disabled={!newCategoryLabel.trim()}>
+            + Add Category
+          </button>
+        </div>
       </div>
 
       <div className="portfolio-admin-list">
@@ -155,10 +224,10 @@ export default function PortfolioAdmin() {
             <select
               className="admin-select"
               value={item.category}
-              onChange={e => patchItem(item.id, { category: e.target.value as Category })}
+              onChange={e => patchItem(item.id, { category: e.target.value })}
             >
-              {CATEGORIES.map(c => (
-                <option key={c} value={c}>{c}</option>
+              {categories.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
 
@@ -229,9 +298,9 @@ export default function PortfolioAdmin() {
               <select
                 className="admin-select"
                 value={newItem.category}
-                onChange={e => setNewItem(p => ({ ...p, category: e.target.value as Category }))}
+                onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
               >
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
 

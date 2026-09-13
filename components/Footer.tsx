@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getInstagramPosts } from '@/lib/instagram'
 
 function InstagramIcon() {
   return (
@@ -10,12 +11,43 @@ function InstagramIcon() {
   )
 }
 
-export default function Footer() {
+export default async function Footer() {
+  const posts = await getInstagramPosts(8)
+
   return (
-    <footer>
+    <>
+      {posts.length > 0 && (
+        <section className="instagram-feed">
+          <a
+            href="https://www.instagram.com/eventsinbloomdmv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="instagram-feed-heading"
+          >
+            <InstagramIcon />
+            @eventsinbloomdmv
+          </a>
+          <div className="instagram-feed-grid">
+            {posts.map(post => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="instagram-feed-item"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={post.mediaUrl} alt={post.caption ?? 'Instagram post'} />
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+      <footer>
       <div className="footer-grid">
         <div>
-          <div className="footer-brand">Events in Bloom</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo_w.svg" alt="Events in Bloom" className="footer-logo-img" />
           <p className="footer-tagline">
             Floral arrangements, event styling, backdrop rentals, and in-home subscriptions — blooms for every occasion.
           </p>
@@ -28,6 +60,7 @@ export default function Footer() {
           <h4 className="footer-heading">Navigate</h4>
           <ul className="footer-links">
             <li><Link href="/">Home</Link></li>
+            <li><Link href="/about">About</Link></li>
             <li><Link href="/portfolio">Portfolio</Link></li>
             <li><Link href="/inquiry">Inquire</Link></li>
           </ul>
@@ -54,6 +87,7 @@ export default function Footer() {
         <span>© 2025 Events in Bloom. All rights reserved.</span>
         <span>Bethesda, MD</span>
       </div>
-    </footer>
+      </footer>
+    </>
   )
 }

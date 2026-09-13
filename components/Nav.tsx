@@ -43,25 +43,21 @@ export default function Nav() {
     <>
       <nav className="nav">
         <Link href="/" className="nav-logo">
-          <span className="nav-logo-text">
-            <span className="logo-bloom">Events</span>
-            <em className="logo-bloom">in</em>
-            <span className="logo-bloom">Bloom</span>
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo_b.svg" alt="Events in Bloom — Floral &amp; Event Styling" className="nav-logo-img" />
         </Link>
         <ul className="nav-links">
-          <li><Link href="/" className={active('/')}>Home</Link></li>
-          <li><Link href="/portfolio" className={active('/portfolio')}>Portfolio</Link></li>
-          <li><Link href="/inquiry" className={active('/inquiry')}>Inquire</Link></li>
+          <li><Link href="/portfolio" className={active('/portfolio')}>Our Work</Link></li>
+          <li><Link href="/#services">Services</Link></li>
+          <li><Link href="/about" className={active('/about')}>About</Link></li>
           <li><Link href={memberLink.href} className={active(memberLink.href)}>{memberLink.label}</Link></li>
-          <li><Link href="/#about">About</Link></li>
           {signedIn && (
             <li>
               <button className="nav-logout-btn" onClick={handleLogout}>Sign Out</button>
             </li>
           )}
         </ul>
-        <Link href="/inquiry" className="nav-cta">Book Now</Link>
+        <Link href="/inquiry" className="nav-cta">Inquire</Link>
         <button className="nav-hamburger" onClick={() => setOpen(true)} aria-label="Open menu">
           <span /><span /><span />
         </button>
@@ -75,12 +71,13 @@ export default function Nav() {
         </button>
         <ul className="mobile-nav-links">
           <li><Link href="/" onClick={close}>Home</Link></li>
-          <li><Link href="/portfolio" onClick={close}>Portfolio</Link></li>
-          <li><Link href="/inquiry" onClick={close}>Inquire</Link></li>
+          <li><Link href="/portfolio" onClick={close}>Our Work</Link></li>
+          <li><Link href="/#services" onClick={close}>Services</Link></li>
+          <li><Link href="/about" onClick={close}>About</Link></li>
           <li><Link href={memberLink.href} onClick={close}>{memberLink.label}</Link></li>
           {signedIn && <li><button className="mobile-nav-logout" onClick={handleLogout}>Sign Out</button></li>}
         </ul>
-        <Link href="/inquiry" className="btn mobile-book-btn" onClick={close}>Book Now</Link>
+        <Link href="/inquiry" className="btn btn-solid mobile-book-btn" onClick={close}>Inquire</Link>
       </div>
       <div className={`mobile-menu-overlay${open ? ' open' : ''}`} onClick={close} />
     </>

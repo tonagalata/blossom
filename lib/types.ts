@@ -1,4 +1,9 @@
-export type Category = 'arrangements' | 'events' | 'rentals'
+export type Category = string
+
+export interface PortfolioCategory {
+  value: string
+  label: string
+}
 
 export interface PortfolioItem {
   id: string
@@ -12,11 +17,67 @@ export interface PortfolioItem {
   createdAt: string
 }
 
+export interface HeroSlide {
+  type: 'image' | 'video'
+  src: string
+}
+
 export interface SiteConfig {
-  heroImage: string
-  aboutImage: string
   previewImages: [string, string, string, string]
+  heroSlides: HeroSlide[]
+  heroSlideDuration: number
   updatedAt: string
+}
+
+export interface LandingContent {
+  hero: {
+    subtitle: string
+    buttonLabel: string
+  }
+  about: {
+    eyebrow: string
+    title: string
+    body: string
+    ctaLabel: string
+  }
+  services: {
+    heading: string
+    items: { title: string; desc: string }[]
+  }
+  gallery: {
+    heading: string
+  }
+  testimonial: {
+    quote: string
+    attribution: string
+  }
+  testimonials: { quote: string; attribution: string }[]
+  cta: {
+    heading: string
+    buttonLabel: string
+  }
+}
+
+export interface PopupOption {
+  value: string
+  label: string
+}
+
+export interface PopupContent {
+  eyebrow: string
+  title: string
+  body: string
+  image: string
+  options: PopupOption[]
+}
+
+export interface AboutPageContent {
+  eyebrow: string
+  title: string
+  body1: string
+  body2: string
+  image: string
+  ctaLabel: string
 }
 
 export interface InquiryAttachment {
