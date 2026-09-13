@@ -2,11 +2,23 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import type { PortfolioItem, SiteConfig, PortfolioCategory, LandingContent, PopupContent, AboutPageContent } from './types'
 
-// NETLIFY=true is set during both build AND runtime on Netlify.
+// `NETLIFY=true` is documented to be set during both build AND runtime on
+// Netlify, but in production this Next.js app's Route Handlers run inside the
+// Netlify Next.js Runtime's own Lambda wrapper, which does not reliably
+// propagate that var — confirmed in production by a save attempt falling
+// through to `localWrite` and failing with ENOENT on the read-only
+// `/var/task` Lambda bundle path. AWS_LAMBDA_FUNCTION_NAME / LAMBDA_TASK_ROOT
+// are standard Lambda-injected vars that are never present on a local dev or
+// build machine, so they're a more reliable "are we actually running in the
+// deployed serverless environment" signal than NETLIFY alone.
 // Blobs only work at runtime (not during the build phase), so every blob
 // helper wraps its entire body in try/catch and returns a safe default on
 // failure — this lets the build succeed and real data is served at runtime.
-const IS_NETLIFY = process.env.NETLIFY === 'true'
+const IS_NETLIFY = Boolean(
+  process.env.NETLIFY === 'true' ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT
+)
 const DATA_DIR = path.join(process.cwd(), 'data')
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
 
