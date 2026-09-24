@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripeClient, getWebhookSecret } from '@/lib/stripe'
-import { markPaymentPaid, getMemberByCustomerId, updateMemberStripe } from '@/lib/db'
+import { markPaymentPaid, getMemberByCustomerId, updateMemberStripe, applyInvoicePaymentByIntent, getInvoice, getCustomer } from '@/lib/db'
+import { sendInvoicePaidEmail } from '@/lib/email'
 import type Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
@@ -24,6 +25,23 @@ export async function POST(request: NextRequest) {
     case 'payment_intent.succeeded': {
       const pi = event.data.object as Stripe.PaymentIntent
       await markPaymentPaid(pi.id)
+
+      const invoiceId = await applyInvoicePaymentByIntent(pi.id)
+      if (invoiceId) {
+        const invoice = await getInvoice(invoiceId)
+        const customer = invoice ? await getCustomer(invoice.customer_id) : null
+        if (invoice && customer && invoice.status === 'paid') {
+          const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+          await sendInvoicePaidEmail({
+            to: customer.email,
+            customerName: [customer.first_name, customer.last_name].filter(Boolean).join(' ') || customer.email,
+            invoiceNumber: invoice.invoice_number,
+            total: invoice.total,
+            currency: invoice.currency,
+            link: `${origin}/invoice/${invoice.token}`,
+          }).catch(() => {})
+        }
+      }
       break
     }
     case 'customer.subscription.created':

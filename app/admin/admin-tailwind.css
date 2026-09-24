@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Scope Tailwind's content scanning to admin-only code so utility generation
+   stays fast and predictable — this file is only ever imported by
+   app/admin/layout.tsx, so it never loads on the public site regardless. */
+@source "../../app/admin";
+@source "../../app/api/admin";
+@source "../../components/ui";
+@source "../../components/admin";
+@source "../../lib/cn.ts";
+
+@theme {
+  --color-bloom-bg: #F5F0EB;
+  --color-bloom-surface: #FFFFFF;
+  --color-bloom-text: #1C1A18;
+  --color-bloom-text-mid: #5A5650;
+  --color-bloom-text-light: #9A9088;
+  --color-bloom-gold: #B8946A;
+  --color-bloom-rose: #BF7E7E;
+  --color-bloom-sage: #8B9E7A;
+  --color-bloom-blush: #D4A8A0;
+  --color-bloom-border: #D0C8BE;
+  --color-bloom-dark: #1E1E1A;
+
+  --font-bloom-serif: var(--font-serif), Georgia, serif;
+  --font-bloom-script: var(--font-script), cursive;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}

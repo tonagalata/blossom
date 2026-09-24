@@ -16,6 +16,15 @@ export default function IntentModal({ content }: { content: PopupContent }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (!open) return
+    const original = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = original
+    }
+  }, [open])
+
   function close() {
     localStorage.setItem('eib_popup_seen', '1')
     setOpen(false)

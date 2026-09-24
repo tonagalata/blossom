@@ -1,5 +1,17 @@
 'use client'
+
 import { useEffect, useState } from 'react'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
+import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Textarea } from '@/components/ui/Textarea'
+import { Select } from '@/components/ui/Select'
+import { Badge } from '@/components/ui/Badge'
+import { DataTable, type Column } from '@/components/ui/DataTable'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Plus, Users } from 'lucide-react'
 
 interface Plan {
   id: string
@@ -36,28 +48,26 @@ interface MemberInquiry {
   member_name: string
 }
 
-type Tab = 'plans' | 'members' | 'inquiries'
+const STATUS_BADGE: Record<string, 'success' | 'gold' | 'warning' | 'neutral'> = {
+  active: 'success', trialing: 'gold', past_due: 'warning', canceled: 'neutral', incomplete: 'warning',
+}
 
 export default function AdminMembersPage() {
-  const [tab, setTab] = useState<Tab>('plans')
   const [plans, setPlans] = useState<Plan[]>([])
   const [members, setMembers] = useState<Member[]>([])
   const [inquiries, setInquiries] = useState<MemberInquiry[]>([])
   const [loading, setLoading] = useState(true)
 
-  // plan form
   const [planForm, setPlanForm] = useState({ name: '', description: '', amountDollars: '', interval: 'month', features: '', sortOrder: '0' })
   const [planSaving, setPlanSaving] = useState(false)
   const [planError, setPlanError] = useState('')
   const [showPlanForm, setShowPlanForm] = useState(false)
 
-  // plan edit
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', description: '', features: '', sortOrder: '0' })
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
 
-  // inquiry reply
   const [replyingId, setReplyingId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [replySaving, setReplySaving] = useState(false)
@@ -109,12 +119,7 @@ export default function AdminMembersPage() {
   function startEdit(plan: Plan) {
     setEditingPlanId(plan.id)
     setEditError('')
-    setEditForm({
-      name: plan.name,
-      description: plan.description ?? '',
-      features: plan.features.join('\n'),
-      sortOrder: String(plan.sort_order),
-    })
+    setEditForm({ name: plan.name, description: plan.description ?? '', features: plan.features.join('\n'), sortOrder: String(plan.sort_order) })
   }
 
   function cancelEdit() {
@@ -179,278 +184,166 @@ export default function AdminMembersPage() {
     }
   }
 
-  const statusColor: Record<string, string> = {
-    active: '#2e7d32', trialing: '#1565c0', past_due: '#e65100', canceled: '#757575', incomplete: '#827717',
-  }
+  const memberColumns: Column<Member>[] = [
+    {
+      key: 'name', header: 'Name / Email',
+      render: m => (
+        <div>
+          <p className="font-medium text-bloom-text">{[m.first_name, m.last_name].filter(Boolean).join(' ') || '—'}</p>
+          <p className="text-xs text-bloom-text-mid">{m.email}</p>
+        </div>
+      ),
+    },
+    { key: 'status', header: 'Status', render: m => m.subscription_status ? <Badge variant={STATUS_BADGE[m.subscription_status] ?? 'neutral'}>{m.subscription_status}</Badge> : '—' },
+    { key: 'renews', header: 'Renews', render: m => m.current_period_end ? new Date(m.current_period_end).toLocaleDateString() : '—' },
+    { key: 'joined', header: 'Joined', render: m => new Date(m.created_at).toLocaleDateString(), sortValue: m => m.created_at },
+  ]
+
+  const openInquiries = inquiries.filter(i => i.status === 'open').length
+
+  if (loading) return <p className="text-sm text-bloom-text-mid">Loading…</p>
 
   return (
-    <div className="admin-page">
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">Members</h1>
-      </div>
+    <div>
+      <PageHeader title="Members" description="Membership plans, active members, and member support inquiries." />
 
-      <div className="admin-tabs">
-        {(['plans', 'members', 'inquiries'] as Tab[]).map(t => (
-          <button
-            key={t}
-            className={`admin-tab${tab === t ? ' active' : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-            {t === 'inquiries' && inquiries.filter(i => i.status === 'open').length > 0 && (
-              <span className="admin-tab-badge">{inquiries.filter(i => i.status === 'open').length}</span>
-            )}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="plans">
+        <TabsList className="mb-6">
+          <TabsTrigger value="plans">Plans</TabsTrigger>
+          <TabsTrigger value="members">Members ({members.length})</TabsTrigger>
+          <TabsTrigger value="inquiries">Inquiries {openInquiries > 0 && `(${openInquiries})`}</TabsTrigger>
+        </TabsList>
 
-      {loading ? <p className="admin-loading">Loading…</p> : (
-        <>
-          {/* ─── Plans ─────────────────────────────────────────── */}
-          {tab === 'plans' && (
-            <div className="admin-section">
-              <div className="admin-section-header">
-                <h2 className="admin-section-title">Membership Plans</h2>
-                <button className="btn admin-add-btn" onClick={() => setShowPlanForm(f => !f)}>
-                  {showPlanForm ? 'Cancel' : '+ New Plan'}
-                </button>
-              </div>
+        <TabsContent value="plans">
+          <div className="mb-4 flex justify-end">
+            <Button onClick={() => setShowPlanForm(f => !f)}>
+              <Plus className="h-4 w-4" /> {showPlanForm ? 'Cancel' : 'New Plan'}
+            </Button>
+          </div>
 
-              {showPlanForm && (
-                <form onSubmit={createPlan} className="admin-form">
-                  {planError && <p className="form-error">{planError}</p>}
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Name</label>
-                      <input className="form-input" value={planForm.name} onChange={e => setPlanForm(f => ({ ...f, name: e.target.value }))} required />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Price (USD)</label>
-                      <input type="number" step="0.01" min="0.50" className="form-input" value={planForm.amountDollars} onChange={e => setPlanForm(f => ({ ...f, amountDollars: e.target.value }))} required />
-                    </div>
+          {showPlanForm && (
+            <Card className="mb-6">
+              <CardContent>
+                <form onSubmit={createPlan} className="space-y-3">
+                  {planError && <p className="text-sm text-red-600">{planError}</p>}
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input placeholder="Name" value={planForm.name} onChange={e => setPlanForm(f => ({ ...f, name: e.target.value }))} required />
+                    <Input type="number" step="0.01" min="0.50" placeholder="Price (USD)" value={planForm.amountDollars} onChange={e => setPlanForm(f => ({ ...f, amountDollars: e.target.value }))} required />
                   </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Billing Interval</label>
-                      <select className="form-input" value={planForm.interval} onChange={e => setPlanForm(f => ({ ...f, interval: e.target.value }))}>
-                        <option value="month">Monthly</option>
-                        <option value="year">Yearly</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Sort Order</label>
-                      <input type="number" className="form-input" value={planForm.sortOrder} onChange={e => setPlanForm(f => ({ ...f, sortOrder: e.target.value }))} />
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Select value={planForm.interval} onChange={e => setPlanForm(f => ({ ...f, interval: e.target.value }))}>
+                      <option value="month">Monthly</option>
+                      <option value="year">Yearly</option>
+                    </Select>
+                    <Input type="number" placeholder="Sort order" value={planForm.sortOrder} onChange={e => setPlanForm(f => ({ ...f, sortOrder: e.target.value }))} />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Description</label>
-                    <input className="form-input" value={planForm.description} onChange={e => setPlanForm(f => ({ ...f, description: e.target.value }))} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Features (one per line)</label>
-                    <textarea className="form-input form-textarea" rows={4} value={planForm.features} onChange={e => setPlanForm(f => ({ ...f, features: e.target.value }))} placeholder="Priority booking&#10;Exclusive discounts&#10;Monthly newsletter" />
-                  </div>
-                  <button type="submit" className="btn" disabled={planSaving}>
-                    {planSaving ? 'Creating…' : 'Create Plan'}
-                  </button>
+                  <Input placeholder="Description" value={planForm.description} onChange={e => setPlanForm(f => ({ ...f, description: e.target.value }))} />
+                  <Textarea rows={4} placeholder="Features (one per line)" value={planForm.features} onChange={e => setPlanForm(f => ({ ...f, features: e.target.value }))} />
+                  <Button type="submit" disabled={planSaving}>{planSaving ? 'Creating…' : 'Create Plan'}</Button>
                 </form>
-              )}
+              </CardContent>
+            </Card>
+          )}
 
-              {plans.length === 0 ? (
-                <p className="admin-empty">No plans yet. Create one above.</p>
-              ) : (
-                <div className="admin-plan-list">
-                  {plans.map(plan => (
-                    <div key={plan.id} className={`admin-plan-card${!plan.active ? ' inactive' : ''}`}>
-                      {editingPlanId === plan.id ? (
-                        <div className="admin-form">
-                          {editError && <p className="form-error">{editError}</p>}
-                          <div className="form-row">
-                            <div className="form-group">
-                              <label className="form-label">Name</label>
-                              <input className="form-input" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} required />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">Sort Order</label>
-                              <input type="number" className="form-input" value={editForm.sortOrder} onChange={e => setEditForm(f => ({ ...f, sortOrder: e.target.value }))} />
-                            </div>
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <input className="form-input" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">Features (one per line)</label>
-                            <textarea className="form-input form-textarea" rows={4} value={editForm.features} onChange={e => setEditForm(f => ({ ...f, features: e.target.value }))} />
-                          </div>
-                          <p className="admin-plan-price">
-                            ${(plan.amount / 100).toFixed(2)}/{plan.interval} — price &amp; interval can&apos;t be changed here since they&apos;re tied to Stripe; delete and recreate the plan to change them.
-                          </p>
-                          <div className="admin-reply-actions">
-                            <button className="btn" onClick={() => saveEdit(plan.id)} disabled={editSaving}>
-                              {editSaving ? 'Saving…' : 'Save Changes'}
-                            </button>
-                            <button className="admin-btn-sm" onClick={cancelEdit}>Cancel</button>
-                          </div>
+          {plans.length === 0 ? (
+            <EmptyState title="No plans yet" description="Create one above." />
+          ) : (
+            <div className="space-y-3">
+              {plans.map(plan => (
+                <Card key={plan.id} className={plan.active ? undefined : 'opacity-60'}>
+                  <CardContent>
+                    {editingPlanId === plan.id ? (
+                      <div className="space-y-3">
+                        {editError && <p className="text-sm text-red-600">{editError}</p>}
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input placeholder="Name" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} required />
+                          <Input type="number" placeholder="Sort order" value={editForm.sortOrder} onChange={e => setEditForm(f => ({ ...f, sortOrder: e.target.value }))} />
                         </div>
-                      ) : (
-                        <>
-                          <div className="admin-plan-header">
-                            <div>
-                              <strong>{plan.name}</strong>
-                              {!plan.active && <span className="admin-plan-inactive-badge">Inactive</span>}
-                              <p className="admin-plan-price">
-                                ${(plan.amount / 100).toFixed(2)}/{plan.interval}
-                              </p>
-                            </div>
-                            <div className="admin-plan-actions">
-                              <button
-                                className="admin-btn-sm"
-                                onClick={() => startEdit(plan)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="admin-btn-sm"
-                                onClick={() => togglePlanActive(plan)}
-                              >
-                                {plan.active ? 'Deactivate' : 'Activate'}
-                              </button>
-                              <button
-                                className="admin-btn-sm admin-btn-danger"
-                                onClick={() => deletePlan(plan.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                          {plan.description && <p className="admin-plan-desc">{plan.description}</p>}
-                          {plan.features.length > 0 && (
-                            <ul className="admin-plan-features">
-                              {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
-                            </ul>
-                          )}
-                          {plan.stripe_price_id && (
-                            <p className="admin-plan-stripe-id">Stripe: {plan.stripe_price_id}</p>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ─── Members ───────────────────────────────────────── */}
-          {tab === 'members' && (
-            <div className="admin-section">
-              <h2 className="admin-section-title">All Members ({members.length})</h2>
-              {members.length === 0 ? (
-                <p className="admin-empty">No members yet.</p>
-              ) : (
-                <div className="admin-table-wrap">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Name / Email</th>
-                        <th>Status</th>
-                        <th>Renews</th>
-                        <th>Joined</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {members.map(m => (
-                        <tr key={m.id}>
-                          <td>
-                            <div>{[m.first_name, m.last_name].filter(Boolean).join(' ') || '—'}</div>
-                            <div className="admin-table-sub">{m.email}</div>
-                          </td>
-                          <td>
-                            {m.subscription_status ? (
-                              <span
-                                className="member-status-pill"
-                                style={{ background: statusColor[m.subscription_status] ?? '#757575' }}
-                              >
-                                {m.subscription_status}
-                              </span>
-                            ) : '—'}
-                          </td>
-                          <td>
-                            {m.current_period_end
-                              ? new Date(m.current_period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                              : '—'}
-                          </td>
-                          <td>{new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ─── Inquiries ─────────────────────────────────────── */}
-          {tab === 'inquiries' && (
-            <div className="admin-section">
-              <h2 className="admin-section-title">Member Inquiries ({inquiries.length})</h2>
-              {inquiries.length === 0 ? (
-                <p className="admin-empty">No inquiries yet.</p>
-              ) : (
-                inquiries.map(inq => (
-                  <div key={inq.id} className={`admin-member-inq status-${inq.status}`}>
-                    <div className="admin-member-inq-header">
-                      <div>
-                        <strong>{inq.subject}</strong>
-                        <span className="admin-member-inq-from"> — {inq.member_name} ({inq.member_email})</span>
-                      </div>
-                      <span className={`admin-member-inq-status status-${inq.status}`}>{inq.status}</span>
-                    </div>
-                    <p className="admin-member-inq-body">{inq.message}</p>
-                    <p className="admin-member-inq-date">
-                      {new Date(inq.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    {inq.reply ? (
-                      <div className="admin-member-inq-reply">
-                        <strong>Your reply:</strong> {inq.reply}
+                        <Input placeholder="Description" value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
+                        <Textarea rows={4} placeholder="Features (one per line)" value={editForm.features} onChange={e => setEditForm(f => ({ ...f, features: e.target.value }))} />
+                        <p className="text-xs text-bloom-text-light">
+                          ${(plan.amount / 100).toFixed(2)}/{plan.interval} — price &amp; interval can&apos;t be changed here since they&apos;re tied to Stripe; delete and recreate the plan to change them.
+                        </p>
+                        <div className="flex gap-2">
+                          <Button onClick={() => saveEdit(plan.id)} disabled={editSaving}>{editSaving ? 'Saving…' : 'Save Changes'}</Button>
+                          <Button variant="outline" onClick={cancelEdit}>Cancel</Button>
+                        </div>
                       </div>
                     ) : (
-                      replyingId === inq.id ? (
-                        <div className="admin-reply-form">
-                          <textarea
-                            className="form-input form-textarea"
-                            rows={3}
-                            value={replyText}
-                            onChange={e => setReplyText(e.target.value)}
-                            placeholder="Type your reply…"
-                            autoFocus
-                          />
-                          <div className="admin-reply-actions">
-                            <button className="btn" onClick={() => submitReply(inq.id)} disabled={replySaving}>
-                              {replySaving ? 'Sending…' : 'Send Reply'}
-                            </button>
-                            <button className="admin-btn-sm" onClick={() => { setReplyingId(null); setReplyText('') }}>
-                              Cancel
-                            </button>
+                      <>
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <strong className="text-bloom-text">{plan.name}</strong>
+                              {!plan.active && <Badge variant="neutral">Inactive</Badge>}
+                            </div>
+                            <p className="text-sm text-bloom-text-mid">${(plan.amount / 100).toFixed(2)}/{plan.interval}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => startEdit(plan)}>Edit</Button>
+                            <Button variant="outline" size="sm" onClick={() => togglePlanActive(plan)}>{plan.active ? 'Deactivate' : 'Activate'}</Button>
+                            <Button variant="destructive" size="sm" onClick={() => deletePlan(plan.id)}>Delete</Button>
                           </div>
                         </div>
-                      ) : (
-                        <button
-                          className="admin-btn-sm"
-                          onClick={() => { setReplyingId(inq.id); setReplyText('') }}
-                        >
-                          Reply
-                        </button>
-                      )
+                        {plan.description && <p className="mt-2 text-sm text-bloom-text-mid">{plan.description}</p>}
+                        {plan.features.length > 0 && (
+                          <ul className="mt-2 space-y-1 text-sm text-bloom-text">
+                            {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
+                          </ul>
+                        )}
+                        {plan.stripe_price_id && <p className="mt-2 text-xs text-bloom-text-light">Stripe: {plan.stripe_price_id}</p>}
+                      </>
                     )}
-                  </div>
-                ))
-              )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
-        </>
-      )}
+        </TabsContent>
+
+        <TabsContent value="members">
+          <DataTable columns={memberColumns} rows={members} rowKey={m => m.id} emptyTitle="No members yet" />
+        </TabsContent>
+
+        <TabsContent value="inquiries">
+          {inquiries.length === 0 ? (
+            <EmptyState icon={Users} title="No inquiries yet" />
+          ) : (
+            <div className="space-y-3">
+              {inquiries.map(inq => (
+                <Card key={inq.id}>
+                  <CardContent>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <strong className="text-bloom-text">{inq.subject}</strong>
+                        <span className="text-sm text-bloom-text-mid"> — {inq.member_name} ({inq.member_email})</span>
+                      </div>
+                      <Badge variant={inq.status === 'open' ? 'gold' : 'neutral'}>{inq.status}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-bloom-text">{inq.message}</p>
+                    <p className="mt-1 text-xs text-bloom-text-light">{new Date(inq.created_at).toLocaleDateString()}</p>
+                    {inq.reply ? (
+                      <div className="mt-3 rounded-md bg-bloom-bg px-3 py-2 text-sm text-bloom-text">
+                        <strong>Your reply:</strong> {inq.reply}
+                      </div>
+                    ) : replyingId === inq.id ? (
+                      <div className="mt-3 space-y-2">
+                        <Textarea rows={3} placeholder="Type your reply…" value={replyText} onChange={e => setReplyText(e.target.value)} autoFocus />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => submitReply(inq.id)} disabled={replySaving}>{replySaving ? 'Sending…' : 'Send Reply'}</Button>
+                          <Button size="sm" variant="outline" onClick={() => { setReplyingId(null); setReplyText('') }}>Cancel</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button size="sm" variant="outline" className="mt-3" onClick={() => { setReplyingId(inq.id); setReplyText('') }}>Reply</Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

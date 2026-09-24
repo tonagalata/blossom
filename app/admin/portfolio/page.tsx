@@ -1,6 +1,14 @@
 'use client'
+
 import { useEffect, useRef, useState } from 'react'
 import type { PortfolioItem, PortfolioCategory } from '@/lib/types'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
+import { Dialog } from '@/components/ui/Dialog'
+import { toast } from '@/components/ui/Toaster'
+import { GripVertical, Plus, Trash2 } from 'lucide-react'
 
 function blankItem(defaultCategory: string): Omit<PortfolioItem, 'id' | 'order' | 'createdAt'> {
   return { src: '', alt: '', title: '', category: defaultCategory, wide: false, visible: true }
@@ -12,7 +20,6 @@ export default function PortfolioAdmin() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [savingCategories, setSavingCategories] = useState(false)
-  const [toast, setToast] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [newItem, setNewItem] = useState(blankItem(''))
   const [images, setImages] = useState<string[]>([])
@@ -20,11 +27,6 @@ export default function PortfolioAdmin() {
   const [newCategoryLabel, setNewCategoryLabel] = useState('')
 
   const dragId = useRef<string | null>(null)
-
-  function showToast(msg: string) {
-    setToast(msg)
-    setTimeout(() => setToast(''), 3000)
-  }
 
   useEffect(() => {
     Promise.all([
@@ -50,10 +52,10 @@ export default function PortfolioAdmin() {
     })
     setSavingCategories(false)
     if (res.ok) {
-      showToast('Categories saved')
+      toast.success('Categories saved')
     } else {
       const data = await res.json().catch(() => null)
-      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+      toast.error(data?.message ? `Save failed: ${data.message}` : 'Save failed')
     }
   }
 
@@ -89,7 +91,7 @@ export default function PortfolioAdmin() {
     if (!confirm('Delete this item?')) return
     setItems(prev => prev.filter(it => it.id !== id))
     await fetch(`/api/admin/portfolio/${id}`, { method: 'DELETE' })
-    showToast('Item deleted')
+    toast.success('Item deleted')
   }
 
   async function addItem() {
@@ -105,7 +107,7 @@ export default function PortfolioAdmin() {
     setNewItem(blankItem(categories[0]?.value ?? ''))
     setShowAdd(false)
     setSaving(false)
-    showToast('Item added')
+    toast.success('Item added')
   }
 
   function onDragStart(id: string) { dragId.current = id }
@@ -125,7 +127,7 @@ export default function PortfolioAdmin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reordered),
     })
-    showToast('Order saved')
+    toast.success('Order saved')
   }
 
   function pickImage(src: string) {
@@ -137,54 +139,43 @@ export default function PortfolioAdmin() {
     setPickerFor(null)
   }
 
-  if (loading) return <div className="admin-loading">Loading…</div>
+  if (loading) return <p className="text-sm text-bloom-text-mid">Loading…</p>
 
   return (
-    <div className="admin-section">
-      <div className="admin-section-header">
-        <h2 className="admin-section-title">Portfolio</h2>
-        <button className="admin-btn admin-btn-primary" onClick={() => setShowAdd(true)}>
-          + Add Item
-        </button>
-      </div>
+    <div>
+      <PageHeader
+        title="Portfolio"
+        description="Manage gallery images shown on the public portfolio."
+        action={<Button onClick={() => setShowAdd(true)}><Plus className="h-4 w-4" /> Add Item</Button>}
+      />
 
-      <div className="admin-subsection">
-        <h3 className="admin-subsection-title">Categories</h3>
-        <div className="category-manager-list">
+      <div className="mb-8 rounded-lg border border-bloom-border bg-white p-5">
+        <h3 className="mb-3 text-sm font-semibold text-bloom-text">Categories</h3>
+        <div className="mb-3 space-y-2">
           {categories.map(c => (
-            <div key={c.value} className="category-manager-row">
-              <input
-                className="admin-input"
+            <div key={c.value} className="flex gap-2">
+              <Input
                 value={c.label}
                 onChange={e => setCategories(prev => prev.map(cat => cat.value === c.value ? { ...cat, label: e.target.value } : cat))}
                 onBlur={e => renameCategory(c.value, e.target.value)}
               />
-              <button
-                className="admin-btn admin-btn-danger admin-btn-sm"
-                onClick={() => deleteCategory(c.value)}
-                disabled={savingCategories}
-              >
-                Delete
-              </button>
+              <Button variant="destructive" size="sm" onClick={() => deleteCategory(c.value)} disabled={savingCategories}>Delete</Button>
             </div>
           ))}
         </div>
-        <div className="category-manager-add">
-          <input
-            className="admin-input"
+        <div className="flex gap-2">
+          <Input
             value={newCategoryLabel}
             onChange={e => setNewCategoryLabel(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCategory() } }}
             placeholder="New category name"
           />
-          <button className="admin-btn admin-btn-sm" onClick={addCategory} disabled={!newCategoryLabel.trim()}>
-            + Add Category
-          </button>
+          <Button variant="outline" size="sm" onClick={addCategory} disabled={!newCategoryLabel.trim()}>Add Category</Button>
         </div>
       </div>
 
-      <div className="portfolio-admin-list">
-        <div className="portfolio-admin-header-row">
+      <div className="rounded-lg border border-bloom-border bg-white">
+        <div className="grid grid-cols-[24px_64px_1fr_140px_60px_60px_40px] items-center gap-3 border-b border-bloom-border px-4 py-2 text-xs font-medium uppercase tracking-wide text-bloom-text-light">
           <span />
           <span>Image</span>
           <span>Title</span>
@@ -197,171 +188,75 @@ export default function PortfolioAdmin() {
         {items.map(item => (
           <div
             key={item.id}
-            className="portfolio-admin-row"
+            className="grid grid-cols-[24px_64px_1fr_140px_60px_60px_40px] items-center gap-3 border-b border-bloom-border px-4 py-2.5 last:border-0"
             draggable
             onDragStart={() => onDragStart(item.id)}
             onDragOver={e => e.preventDefault()}
             onDrop={() => onDrop(item.id)}
           >
-            <span className="drag-handle" title="Drag to reorder">⠿</span>
+            <GripVertical className="h-4 w-4 cursor-grab text-bloom-text-light" />
 
-            <div className="portfolio-admin-thumb-wrap">
+            <div className="flex flex-col items-start gap-1">
               {item.src && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img className="portfolio-admin-thumb" src={item.src} alt={item.alt} />
+                <img className="h-10 w-10 rounded object-cover" src={item.src} alt={item.alt} />
               )}
-              <button
-                className="admin-btn admin-btn-sm"
-                onClick={() => setPickerFor(item.id)}
-              >
+              <button className="text-xs text-bloom-gold underline" onClick={() => setPickerFor(item.id)}>
                 {item.src ? 'Change' : 'Pick'}
               </button>
             </div>
 
-            <input
-              className="admin-input"
-              value={item.title}
-              onChange={e => patchItem(item.id, { title: e.target.value })}
-              onBlur={e => patchItem(item.id, { title: e.target.value })}
-              placeholder="Title"
-            />
+            <Input value={item.title} onChange={e => patchItem(item.id, { title: e.target.value })} placeholder="Title" />
 
-            <select
-              className="admin-select"
-              value={item.category}
-              onChange={e => patchItem(item.id, { category: e.target.value })}
-            >
-              {categories.map(c => (
-                <option key={c.value} value={c.value}>{c.label}</option>
-              ))}
-            </select>
+            <Select value={item.category} onChange={e => patchItem(item.id, { category: e.target.value })}>
+              {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </Select>
 
-            <input
-              type="checkbox"
-              checked={item.wide}
-              onChange={e => patchItem(item.id, { wide: e.target.checked })}
-              title="Wide layout"
-            />
+            <input type="checkbox" checked={item.wide} onChange={e => patchItem(item.id, { wide: e.target.checked })} title="Wide layout" className="h-4 w-4" />
 
-            <label className="admin-toggle" title="Visible">
-              <input
-                type="checkbox"
-                checked={item.visible}
-                onChange={e => patchItem(item.id, { visible: e.target.checked })}
-              />
-              <span className="admin-toggle-track" />
-            </label>
+            <input type="checkbox" checked={item.visible} onChange={e => patchItem(item.id, { visible: e.target.checked })} title="Visible" className="h-4 w-4" />
 
-            <button
-              className="admin-btn admin-btn-danger admin-btn-sm"
-              onClick={() => deleteItem(item.id)}
-            >
-              Delete
-            </button>
+            <Button variant="ghost" size="icon" onClick={() => deleteItem(item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
           </div>
         ))}
       </div>
 
-      {showAdd && (
-        <div className="admin-modal-overlay" onClick={() => setShowAdd(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="admin-modal-title">Add Portfolio Item</h3>
-
-            <div className="admin-field">
-              <label className="admin-label">Image</label>
-              {newItem.src && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img className="admin-preview-img" src={newItem.src} alt="" />
-              )}
-              <button className="admin-btn admin-btn-sm" onClick={() => setPickerFor('new')}>
-                {newItem.src ? 'Change Image' : 'Pick Image'}
-              </button>
-            </div>
-
-            <div className="admin-field">
-              <label className="admin-label">Title</label>
-              <input
-                className="admin-input"
-                value={newItem.title}
-                onChange={e => setNewItem(p => ({ ...p, title: e.target.value }))}
-                placeholder="Arrangement title"
-              />
-            </div>
-
-            <div className="admin-field">
-              <label className="admin-label">Alt text</label>
-              <input
-                className="admin-input"
-                value={newItem.alt}
-                onChange={e => setNewItem(p => ({ ...p, alt: e.target.value }))}
-                placeholder="Describe the image"
-              />
-            </div>
-
-            <div className="admin-field">
-              <label className="admin-label">Category</label>
-              <select
-                className="admin-select"
-                value={newItem.category}
-                onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
-              >
-                {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-
-            <div className="admin-field admin-field-row">
-              <label className="admin-label">
-                <input
-                  type="checkbox"
-                  checked={newItem.wide}
-                  onChange={e => setNewItem(p => ({ ...p, wide: e.target.checked }))}
-                />
-                {' '}Wide layout
-              </label>
-              <label className="admin-label">
-                <input
-                  type="checkbox"
-                  checked={newItem.visible}
-                  onChange={e => setNewItem(p => ({ ...p, visible: e.target.checked }))}
-                />
-                {' '}Visible
-              </label>
-            </div>
-
-            <div className="admin-modal-actions">
-              <button className="admin-btn" onClick={() => setShowAdd(false)}>Cancel</button>
-              <button
-                className="admin-btn admin-btn-primary"
-                onClick={addItem}
-                disabled={saving || !newItem.src || !newItem.title}
-              >
-                {saving ? 'Adding…' : 'Add Item'}
-              </button>
-            </div>
+      <Dialog open={showAdd} onClose={() => setShowAdd(false)} title="Add Portfolio Item">
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-bloom-text-mid">Image</label>
+            {newItem.src && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="mb-2 h-24 w-24 rounded object-cover" src={newItem.src} alt="" />
+            )}
+            <Button variant="outline" size="sm" onClick={() => setPickerFor('new')}>{newItem.src ? 'Change Image' : 'Pick Image'}</Button>
+          </div>
+          <Input placeholder="Arrangement title" value={newItem.title} onChange={e => setNewItem(p => ({ ...p, title: e.target.value }))} />
+          <Input placeholder="Alt text" value={newItem.alt} onChange={e => setNewItem(p => ({ ...p, alt: e.target.value }))} />
+          <Select value={newItem.category} onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}>
+            {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </Select>
+          <div className="flex gap-4 text-sm text-bloom-text">
+            <label className="flex items-center gap-1.5"><input type="checkbox" checked={newItem.wide} onChange={e => setNewItem(p => ({ ...p, wide: e.target.checked }))} /> Wide layout</label>
+            <label className="flex items-center gap-1.5"><input type="checkbox" checked={newItem.visible} onChange={e => setNewItem(p => ({ ...p, visible: e.target.checked }))} /> Visible</label>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Cancel</Button>
+            <Button onClick={addItem} disabled={saving || !newItem.src || !newItem.title}>{saving ? 'Adding…' : 'Add Item'}</Button>
           </div>
         </div>
-      )}
+      </Dialog>
 
-      {pickerFor !== null && (
-        <div className="admin-modal-overlay" onClick={() => setPickerFor(null)}>
-          <div className="admin-modal admin-modal-wide" onClick={e => e.stopPropagation()}>
-            <h3 className="admin-modal-title">Pick an Image</h3>
-            <div className="image-picker-grid">
-              {images.map(src => (
-                <div key={src} className="image-picker-item" onClick={() => pickImage(src)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" />
-                </div>
-              ))}
-            </div>
-            <div className="admin-modal-actions">
-              <button className="admin-btn" onClick={() => setPickerFor(null)}>Cancel</button>
-            </div>
-          </div>
+      <Dialog open={pickerFor !== null} onClose={() => setPickerFor(null)} title="Pick an Image" className="max-w-2xl">
+        <div className="grid max-h-96 grid-cols-4 gap-2 overflow-y-auto sm:grid-cols-6">
+          {images.map(src => (
+            <button key={src} onClick={() => pickImage(src)} className="aspect-square overflow-hidden rounded-md border border-bloom-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="h-full w-full object-cover" />
+            </button>
+          ))}
         </div>
-      )}
-
-      {toast && <div className="admin-toast">{toast}</div>}
+      </Dialog>
     </div>
   )
 }

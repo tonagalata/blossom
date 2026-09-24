@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(rm app/api/admin/proposals/\\\\[id\\\\]/pdf/route.ts)",
+      "Bash(curl -s -o /dev/null -w \"admin-redirect: %{http_code}\\\\n\" http://localhost:3000/admin)",
+      "Read(//private/tmp/**)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(grep -n \"^img {$\\\\|^a {$\\\\|^button {$\\\\|^\\\\*, \\\\*::before\" app/globals.css)"
+    ],
+    "additionalDirectories": [
+      "/Users/gtona/Development/misc/blossom/app/api/admin/proposals/[id]/pdf"
+    ]
+  }
+}

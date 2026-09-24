@@ -164,3 +164,122 @@ export interface Inquiry {
   read: number
   attachments: InquiryAttachment[]
 }
+
+// ─── Business Management ───────────────────────────────────────────────────────
+
+export interface Customer {
+  id: string
+  created_at: string
+  first_name: string | null
+  last_name: string | null
+  email: string
+  phone: string | null
+  company: string | null
+  address: string | null
+  notes: string | null
+  source: 'inquiry' | 'manual'
+  inquiry_id: string | null
+}
+
+export interface LineItem {
+  id: string
+  title: string
+  description: string | null
+  qty: number
+  unit_price: number // cents
+  sort_order: number
+  image_url: string | null
+}
+
+export type ProposalStatus = 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired'
+
+export interface Proposal {
+  id: string
+  created_at: string
+  updated_at: string
+  customer_id: string
+  token: string
+  title: string
+  event_date: string | null
+  status: ProposalStatus
+  subtotal: number
+  tax_rate: number
+  tax_amount: number
+  total: number
+  currency: string
+  valid_until: string | null
+  notes: string | null
+  terms: string | null
+  sent_at: string | null
+  viewed_at: string | null
+  responded_at: string | null
+  deposit_percentage: number
+  payment_request_id: string | null
+  line_items: LineItem[]
+  signature: ESignature | null
+  payment_request_token: string | null
+  deposit_status: 'pending' | 'paid' | 'cancelled' | null
+}
+
+export interface ProposalLineItem extends LineItem {
+  proposal_id: string
+}
+
+export interface ESignature {
+  id: string
+  signer_name: string
+  signer_email: string
+  signature_data: string
+  signed_at: string
+  ip_address: string | null
+  user_agent: string | null
+  document_hash: string
+}
+
+export interface ProposalSignature extends ESignature {
+  proposal_id: string
+}
+
+export type InvoiceStatus = 'draft' | 'sent' | 'partial' | 'paid' | 'overdue' | 'void'
+
+export interface Invoice {
+  id: string
+  created_at: string
+  updated_at: string
+  customer_id: string
+  proposal_id: string | null
+  token: string
+  invoice_number: string
+  status: InvoiceStatus
+  issue_date: string | null
+  due_date: string | null
+  subtotal: number
+  tax_rate: number
+  tax_amount: number
+  total: number
+  amount_paid: number
+  currency: string
+  notes: string | null
+  terms: string | null
+  sent_at: string | null
+  payment_request_id: string | null
+  line_items: LineItem[]
+  signature: ESignature | null
+  payment_request_token: string | null
+}
+
+export interface InvoiceLineItem extends LineItem {
+  invoice_id: string
+}
+
+export interface InvoiceSignature extends ESignature {
+  invoice_id: string
+}
+
+export interface DashboardStats {
+  openInquiries: number
+  outstandingInvoiceTotal: number
+  pendingProposals: number
+  activeMembers: number
+  mrr: number
+}

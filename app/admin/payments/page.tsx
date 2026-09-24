@@ -1,31 +1,31 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import type { PaymentRequest } from '@/lib/types'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Dialog } from '@/components/ui/Dialog'
+import { DataTable, type Column } from '@/components/ui/DataTable'
+import { StatusBadge } from '@/components/ui/Badge'
+import { toast } from '@/components/ui/Toaster'
+import { Plus, Copy, Trash2, Check } from 'lucide-react'
 
 function fmt(cents: number, currency: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(cents / 100)
-}
-
-function StatusBadge({ status }: { status: PaymentRequest['status'] }) {
-  const cls = status === 'paid' ? 'payment-badge-paid' : status === 'cancelled' ? 'payment-badge-cancelled' : 'payment-badge-pending'
-  return <span className={`payment-badge ${cls}`}>{status}</span>
 }
 
 export default function PaymentsAdmin() {
   const [payments, setPayments] = useState<PaymentRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
-  const [toast, setToast] = useState('')
 
   const [desc, setDesc] = useState('')
   const [amount, setAmount] = useState('')
   const [clientName, setClientName] = useState('')
   const [clientEmail, setClientEmail] = useState('')
   const [creating, setCreating] = useState(false)
-
   const [copiedId, setCopiedId] = useState<string | null>(null)
-
-  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : ''
 
@@ -50,7 +50,7 @@ export default function PaymentsAdmin() {
     setShowCreate(false)
     setDesc(''); setAmount(''); setClientName(''); setClientEmail('')
     setCreating(false)
-    showToast('Payment request created')
+    toast.success('Payment request created')
     copyLink(token)
   }
 
@@ -64,86 +64,65 @@ export default function PaymentsAdmin() {
     if (!confirm('Delete this payment request?')) return
     await fetch(`/api/admin/payments/${id}`, { method: 'DELETE' })
     setPayments(prev => prev.filter(p => p.id !== id))
-    showToast('Deleted')
+    toast.success('Deleted')
   }
 
-  if (loading) return <div className="admin-loading">Loading…</div>
+  const columns: Column<PaymentRequest>[] = [
+    {
+      key: 'description', header: 'Description',
+      render: p => (
+        <div>
+          <p className="font-medium text-bloom-text">{p.description}</p>
+          {p.client_name && <p className="text-xs text-bloom-text-mid">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ''}</p>}
+        </div>
+      ),
+    },
+    { key: 'amount', header: 'Amount', render: p => fmt(p.amount, p.currency), sortValue: p => p.amount },
+    { key: 'status', header: 'Status', render: p => <StatusBadge status={p.status} /> },
+    { key: 'created', header: 'Created', render: p => new Date(p.created_at).toLocaleDateString(), sortValue: p => p.created_at },
+    {
+      key: 'actions', header: '', className: 'text-right',
+      render: p => p.status === 'pending' ? (
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={() => copyLink(p.token)}>
+            {copiedId === p.token ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copiedId === p.token ? 'Copied' : 'Copy Link'}
+          </Button>
+          <Button variant="destructive" size="sm" onClick={() => deletePayment(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+        </div>
+      ) : null,
+    },
+  ]
 
   return (
-    <div className="admin-section">
-      <div className="admin-section-header">
-        <h2 className="admin-section-title">Payments</h2>
-        <button className="admin-btn admin-btn-primary" onClick={() => setShowCreate(true)}>
-          + New Request
-        </button>
-      </div>
+    <div>
+      <PageHeader
+        title="Payments"
+        description="One-off Stripe payment links for deposits and balances."
+        action={<Button onClick={() => setShowCreate(true)}><Plus className="h-4 w-4" /> New Request</Button>}
+      />
 
-      {payments.length === 0 && (
-        <p className="admin-empty">No payment requests yet. Create one and send the link to your client.</p>
-      )}
+      <DataTable
+        columns={columns}
+        rows={payments}
+        loading={loading}
+        rowKey={p => p.id}
+        emptyTitle="No payment requests yet"
+        emptyDescription="Create one and send the link to your client."
+      />
 
-      <div className="payment-list">
-        {payments.map(p => (
-          <div key={p.id} className="payment-row">
-            <div className="payment-row-main">
-              <div>
-                <p className="payment-description">{p.description}</p>
-                {p.client_name && <p className="payment-client">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ''}</p>}
-                <p className="payment-meta">
-                  {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  {p.paid_at && ` · Paid ${new Date(p.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                </p>
-              </div>
-              <div className="payment-row-right">
-                <span className="payment-amount">{fmt(p.amount, p.currency)}</span>
-                <StatusBadge status={p.status} />
-              </div>
-            </div>
-            {p.status === 'pending' && (
-              <div className="payment-row-actions">
-                <button className="admin-btn admin-btn-sm" onClick={() => copyLink(p.token)}>
-                  {copiedId === p.token ? '✓ Copied' : 'Copy Link'}
-                </button>
-                <button className="admin-btn admin-btn-sm admin-btn-danger" onClick={() => deletePayment(p.id)}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {showCreate && (
-        <div className="admin-modal-overlay" onClick={() => setShowCreate(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="admin-modal-title">New Payment Request</h3>
-            <div className="admin-field">
-              <label className="admin-label">Description *</label>
-              <input className="admin-input" value={desc} onChange={e => setDesc(e.target.value)} placeholder="e.g. 50% deposit — Smith wedding florals" />
-            </div>
-            <div className="admin-field">
-              <label className="admin-label">Amount (USD) *</label>
-              <input className="admin-input" type="number" min="1" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="1500.00" />
-            </div>
-            <div className="admin-field">
-              <label className="admin-label">Client Name</label>
-              <input className="admin-input" value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Jane Smith" />
-            </div>
-            <div className="admin-field">
-              <label className="admin-label">Client Email (for Stripe receipt)</label>
-              <input className="admin-input" type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="jane@example.com" />
-            </div>
-            <div className="admin-modal-actions">
-              <button className="admin-btn" onClick={() => setShowCreate(false)}>Cancel</button>
-              <button className="admin-btn admin-btn-primary" onClick={createPayment} disabled={creating || !desc || !amount}>
-                {creating ? 'Creating…' : 'Create & Copy Link'}
-              </button>
-            </div>
+      <Dialog open={showCreate} onClose={() => setShowCreate(false)} title="New Payment Request">
+        <div className="space-y-3">
+          <Input placeholder="Description *" value={desc} onChange={e => setDesc(e.target.value)} />
+          <Input type="number" min="1" step="0.01" placeholder="Amount (USD) *" value={amount} onChange={e => setAmount(e.target.value)} />
+          <Input placeholder="Client name" value={clientName} onChange={e => setClientName(e.target.value)} />
+          <Input type="email" placeholder="Client email (for Stripe receipt)" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
+            <Button onClick={createPayment} disabled={creating || !desc || !amount}>{creating ? 'Creating…' : 'Create & Copy Link'}</Button>
           </div>
         </div>
-      )}
-
-      {toast && <div className="admin-toast">{toast}</div>}
+      </Dialog>
     </div>
   )
 }

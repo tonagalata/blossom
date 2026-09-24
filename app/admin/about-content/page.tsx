@@ -1,19 +1,30 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import type { AboutPageContent } from '@/lib/types'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Textarea } from '@/components/ui/Textarea'
+import { Dialog } from '@/components/ui/Dialog'
+import { toast } from '@/components/ui/Toaster'
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-3">
+      <label className="mb-1 block text-xs font-medium text-bloom-text-mid">{label}</label>
+      {children}
+    </div>
+  )
+}
 
 export default function AboutContentAdmin() {
   const [content, setContent] = useState<AboutPageContent | null>(null)
   const [images, setImages] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [toast, setToast] = useState('')
   const [pickerOpen, setPickerOpen] = useState(false)
-
-  function showToast(msg: string) {
-    setToast(msg)
-    setTimeout(() => setToast(''), 3000)
-  }
 
   useEffect(() => {
     Promise.all([
@@ -36,10 +47,10 @@ export default function AboutContentAdmin() {
     })
     setSaving(false)
     if (res.ok) {
-      showToast('Saved')
+      toast.success('Saved')
     } else {
       const data = await res.json().catch(() => null)
-      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+      toast.error(data?.message ? `Save failed: ${data.message}` : 'Save failed')
     }
   }
 
@@ -48,95 +59,51 @@ export default function AboutContentAdmin() {
     setPickerOpen(false)
   }
 
-  if (loading) return <div className="admin-loading">Loading…</div>
-  if (!content) return <div className="admin-loading">No content found.</div>
+  if (loading) return <p className="text-sm text-bloom-text-mid">Loading…</p>
+  if (!content) return <p className="text-sm text-bloom-text-mid">No content found.</p>
 
   return (
-    <div className="admin-section">
-      <div className="admin-section-header">
-        <h2 className="admin-section-title">About Us Page</h2>
-        <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving}>
-          {saving ? 'Saving…' : 'Save'}
-        </button>
+    <div>
+      <PageHeader
+        title="About Us Page"
+        description="Edit the copy and image shown on the public About page."
+        action={<Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>}
+      />
+
+      <div className="space-y-6">
+        <Card>
+          <CardHeader><CardTitle>Content</CardTitle></CardHeader>
+          <CardContent>
+            <Field label="Eyebrow"><Input value={content.eyebrow} onChange={e => setContent({ ...content, eyebrow: e.target.value })} /></Field>
+            <Field label="Title"><Input value={content.title} onChange={e => setContent({ ...content, title: e.target.value })} /></Field>
+            <Field label="Paragraph 1"><Textarea value={content.body1} onChange={e => setContent({ ...content, body1: e.target.value })} /></Field>
+            <Field label="Paragraph 2"><Textarea value={content.body2} onChange={e => setContent({ ...content, body2: e.target.value })} /></Field>
+            <Field label="Button Label"><Input value={content.ctaLabel} onChange={e => setContent({ ...content, ctaLabel: e.target.value })} /></Field>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Image</CardTitle></CardHeader>
+          <CardContent>
+            {content.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="mb-3 w-full max-w-sm rounded-md border border-bloom-border object-cover" src={content.image} alt="About" />
+            )}
+            <Button variant="outline" size="sm" onClick={() => setPickerOpen(true)}>Change</Button>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="admin-subsection">
-        <h3 className="admin-subsection-title">Content</h3>
-        <div className="admin-field">
-          <label className="admin-label">Eyebrow</label>
-          <input
-            className="admin-input"
-            value={content.eyebrow}
-            onChange={e => setContent({ ...content, eyebrow: e.target.value })}
-          />
+      <Dialog open={pickerOpen} onClose={() => setPickerOpen(false)} title="Pick an Image" className="max-w-2xl">
+        <div className="grid max-h-96 grid-cols-4 gap-2 overflow-y-auto sm:grid-cols-6">
+          {images.map(src => (
+            <button key={src} onClick={() => pickImage(src)} className="aspect-square overflow-hidden rounded-md border border-bloom-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="h-full w-full object-cover" />
+            </button>
+          ))}
         </div>
-        <div className="admin-field">
-          <label className="admin-label">Title</label>
-          <input
-            className="admin-input"
-            value={content.title}
-            onChange={e => setContent({ ...content, title: e.target.value })}
-          />
-        </div>
-        <div className="admin-field">
-          <label className="admin-label">Paragraph 1</label>
-          <textarea
-            className="admin-textarea"
-            value={content.body1}
-            onChange={e => setContent({ ...content, body1: e.target.value })}
-          />
-        </div>
-        <div className="admin-field">
-          <label className="admin-label">Paragraph 2</label>
-          <textarea
-            className="admin-textarea"
-            value={content.body2}
-            onChange={e => setContent({ ...content, body2: e.target.value })}
-          />
-        </div>
-        <div className="admin-field">
-          <label className="admin-label">Button Label</label>
-          <input
-            className="admin-input"
-            value={content.ctaLabel}
-            onChange={e => setContent({ ...content, ctaLabel: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="admin-subsection">
-        <h3 className="admin-subsection-title">Image</h3>
-        {content.image && (
-          <div className="site-content-preview-wrap">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="site-content-preview" src={content.image} alt="About" />
-          </div>
-        )}
-        <button className="admin-btn admin-btn-sm" onClick={() => setPickerOpen(true)}>
-          Change
-        </button>
-      </div>
-
-      {pickerOpen && (
-        <div className="admin-modal-overlay" onClick={() => setPickerOpen(false)}>
-          <div className="admin-modal admin-modal-wide" onClick={e => e.stopPropagation()}>
-            <h3 className="admin-modal-title">Pick an Image</h3>
-            <div className="image-picker-grid">
-              {images.map(src => (
-                <div key={src} className="image-picker-item" onClick={() => pickImage(src)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" />
-                </div>
-              ))}
-            </div>
-            <div className="admin-modal-actions">
-              <button className="admin-btn" onClick={() => setPickerOpen(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {toast && <div className="admin-toast">{toast}</div>}
+      </Dialog>
     </div>
   )
 }

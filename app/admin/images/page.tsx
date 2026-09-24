@@ -1,5 +1,11 @@
 'use client'
+
 import { useEffect, useRef, useState } from 'react'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { toast } from '@/components/ui/Toaster'
+import { cn } from '@/lib/cn'
+import { UploadCloud, Trash2 } from 'lucide-react'
 
 export default function ImagesAdmin() {
   const [uploaded, setUploaded] = useState<string[]>([])
@@ -7,13 +13,7 @@ export default function ImagesAdmin() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
-  const [toast, setToast] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
-
-  function showToast(msg: string) {
-    setToast(msg)
-    setTimeout(() => setToast(''), 3000)
-  }
 
   async function loadImages() {
     const res = await fetch('/api/admin/images')
@@ -34,19 +34,19 @@ export default function ImagesAdmin() {
       const res = await fetch('/api/admin/upload', { method: 'POST', body: form })
       if (!res.ok) {
         const err = await res.json()
-        showToast(err.error || 'Upload failed')
+        toast.error(err.error || 'Upload failed')
       }
     }
     await loadImages()
     setUploading(false)
-    showToast('Upload complete')
+    toast.success('Upload complete')
   }
 
   async function deleteImage(filename: string) {
     if (!confirm(`Delete ${filename}?`)) return
     await fetch(`/api/admin/images/${filename}`, { method: 'DELETE' })
     setUploaded(prev => prev.filter(u => !u.includes(filename)))
-    showToast('Image deleted')
+    toast.success('Image deleted')
   }
 
   function onDrop(e: React.DragEvent) {
@@ -55,16 +55,17 @@ export default function ImagesAdmin() {
     uploadFiles(e.dataTransfer.files)
   }
 
-  if (loading) return <div className="admin-loading">Loading…</div>
+  if (loading) return <p className="text-sm text-bloom-text-mid">Loading…</p>
 
   return (
-    <div className="admin-section">
-      <div className="admin-section-header">
-        <h2 className="admin-section-title">Image Library</h2>
-      </div>
+    <div>
+      <PageHeader title="Image Library" description="Upload and manage images used across the site." />
 
       <div
-        className={`upload-zone${dragOver ? ' drag-over' : ''}`}
+        className={cn(
+          'mb-8 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed py-12 text-center text-sm text-bloom-text-mid transition-colors',
+          dragOver ? 'border-bloom-gold bg-bloom-gold/5' : 'border-bloom-border'
+        )}
         onClick={() => fileRef.current?.click()}
         onDragOver={e => { e.preventDefault(); setDragOver(true) }}
         onDragLeave={() => setDragOver(false)}
@@ -74,9 +75,9 @@ export default function ImagesAdmin() {
           <p>Uploading…</p>
         ) : (
           <>
-            <p className="upload-zone-icon">↑</p>
+            <UploadCloud className="mb-1 h-6 w-6 text-bloom-text-light" />
             <p>Drag &amp; drop images here, or click to browse</p>
-            <p className="upload-zone-hint">JPG, PNG, WebP, GIF — max 6 MB</p>
+            <p className="text-xs text-bloom-text-light">JPG, PNG, WebP, GIF — max 6 MB</p>
           </>
         )}
         <input
@@ -84,30 +85,25 @@ export default function ImagesAdmin() {
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
           multiple
-          style={{ display: 'none' }}
+          className="hidden"
           onChange={e => uploadFiles(e.target.files)}
         />
       </div>
 
       {uploaded.length > 0 && (
         <>
-          <h3 className="admin-subsection-title">Uploaded</h3>
-          <div className="image-library-grid">
+          <h3 className="mb-3 text-sm font-semibold text-bloom-text">Uploaded</h3>
+          <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
             {uploaded.map(src => {
               const filename = src.split('/').pop() ?? src
               return (
-                <div key={src} className="image-library-item">
+                <div key={src} className="group relative overflow-hidden rounded-lg border border-bloom-border bg-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={filename} />
-                  <div className="image-library-overlay">
-                    <button
-                      className="admin-btn admin-btn-danger admin-btn-sm"
-                      onClick={() => deleteImage(filename)}
-                    >
-                      Delete
-                    </button>
+                  <img src={src} alt={filename} className="aspect-square w-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button variant="destructive" size="sm" onClick={() => deleteImage(filename)}><Trash2 className="h-3.5 w-3.5" /> Delete</Button>
                   </div>
-                  <p className="image-library-name">{filename}</p>
+                  <p className="truncate px-2 py-1 text-xs text-bloom-text-mid">{filename}</p>
                 </div>
               )
             })}
@@ -115,18 +111,16 @@ export default function ImagesAdmin() {
         </>
       )}
 
-      <h3 className="admin-subsection-title">Built-in</h3>
-      <div className="image-library-grid">
+      <h3 className="mb-3 text-sm font-semibold text-bloom-text">Built-in</h3>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
         {builtin.map(src => (
-          <div key={src} className="image-library-item image-library-item-builtin">
+          <div key={src} className="overflow-hidden rounded-lg border border-bloom-border bg-white opacity-80">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={src.split('/').pop()} />
-            <p className="image-library-name">{src.split('/').pop()}</p>
+            <img src={src} alt={src.split('/').pop()} className="aspect-square w-full object-cover" />
+            <p className="truncate px-2 py-1 text-xs text-bloom-text-mid">{src.split('/').pop()}</p>
           </div>
         ))}
       </div>
-
-      {toast && <div className="admin-toast">{toast}</div>}
     </div>
   )
 }

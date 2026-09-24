@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+body { margin: 0; background: #f4f2ef; }
+a { color: #1a1a1a; } a:hover { color: #6b6b6b; }
+</style>
+</helmet>
+<section style="padding: 48px 44px 90px; font-family: 'Cormorant Garamond', Georgia, serif; display: flex; flex-direction: column; gap: 30px;">
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #8a8378;">Events in Bloom &middot; logo asset set</div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 400; color: #1a1a1a;">Great Vibes rebuild &mdash; one line out of the M into the leaves</h1>
+  </div>
+
+  <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+    <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">PRIMARY HORIZONTAL LOCKUP</div>
+    <div id="lockup-primary" style="background: #fff; padding: 56px 64px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+      <div style="position: relative; font-family: 'Great Vibes', cursive; font-size: 104px; line-height: 1.05; color: #14120f; white-space: nowrap;">Events in Bloom<svg viewBox="0 0 130 70" fill="none" style="position: absolute; left: calc(100% - 0.135em); bottom: 0.179em; width: 1.25em; height: 0.673em; overflow: visible;" aria-hidden="true"><path d="M0 44.5 C 22 42.5, 52 38.3, 71.3 29.2 C 83 20, 89.5 4, 91 -20 C 90.5 3, 86.5 20.5, 72.7 30.8 C 52.5 40.3, 22 44, 0 45.5 Z" fill="#14120f" /><path d="M87.5 2 C 78 -6, 70 -18, 69.5 -30 C 80 -22, 88.5 -10, 87.5 2 Z" fill="#14120f" /><path d="M83 14 C 94 5, 110 2.5, 122 6.5 C 112 20, 93 23, 83 14 Z" fill="#14120f" /></svg></div>
+      <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 400; letter-spacing: 0.44em; color: #14120f; text-indent: 0.44em;">FLORAL &amp; EVENT STYLING</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    <div style="flex: 1 1 360px; min-width: 0; background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+      <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">STACKED LOCKUP</div>
+      <div id="lockup-stacked" style="background: #fff; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 0;">
+        <div style="font-family: 'Great Vibes', cursive; font-size: 76px; line-height: 1.1; color: #14120f;">Events</div>
+        <div style="position: relative; font-family: 'Great Vibes', cursive; font-size: 76px; line-height: 1.05; color: #14120f; white-space: nowrap;">in Bloom<svg viewBox="0 0 130 70" fill="none" style="position: absolute; left: calc(100% - 0.135em); bottom: 0.179em; width: 1.25em; height: 0.673em; overflow: visible;" aria-hidden="true"><path d="M0 44.5 C 22 42.5, 52 38.3, 71.3 29.2 C 83 20, 89.5 4, 91 -20 C 90.5 3, 86.5 20.5, 72.7 30.8 C 52.5 40.3, 22 44, 0 45.5 Z" fill="#14120f" /><path d="M87.5 2 C 78 -6, 70 -18, 69.5 -30 C 80 -22, 88.5 -10, 87.5 2 Z" fill="#14120f" /><path d="M83 14 C 94 5, 110 2.5, 122 6.5 C 112 20, 93 23, 83 14 Z" fill="#14120f" /></svg></div>
+        <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 11px; letter-spacing: 0.38em; color: #14120f; text-indent: 0.38em; margin-top: 16px; white-space: nowrap;">FLORAL &amp; EVENT STYLING</div>
+      </div>
+    </div>
+
+    <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 30px;">
+      <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">EiB MONOGRAM</div>
+        <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+          <div id="monogram-light" style="width: 180px; height: 180px; background: #fff; border: 1px solid #f0ece6; display: flex; align-items: center; justify-content: center;">
+            <img src="logo/svg/eib-monogram-black.svg" alt="EiB monogram" style="width: 128px; height: auto; display: block;" />
+          </div>
+          <div id="monogram-dark" style="width: 180px; height: 180px; background: #14120f; display: flex; align-items: center; justify-content: center;">
+            <img src="logo/svg/eib-monogram-white.svg" alt="EiB monogram reversed" style="width: 128px; height: auto; display: block;" />
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">FAVICON / AVATAR</div>
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+          <img id="favicon-512" src="logo/svg/eib-favicon-dark.svg" alt="EiB avatar" style="width: 132px; height: 132px; display: block;" />
+          <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+            <img src="logo/svg/eib-favicon-dark.svg" alt="EiB 64" style="width: 64px; height: 64px; display: block;" />
+            <img src="logo/svg/eib-favicon-dark.svg" alt="EiB 32" style="width: 32px; height: 32px; display: block;" />
+            <div style="font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: #8a8378;">64 / 32</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+    <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">REVERSED LOCKUP</div>
+    <div id="lockup-reversed" style="background: #14120f; padding: 56px 64px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+      <div style="position: relative; font-family: 'Great Vibes', cursive; font-size: 104px; line-height: 1.05; color: #fdfcfa; white-space: nowrap;">Events in Bloom<svg viewBox="0 0 130 70" fill="none" style="position: absolute; left: calc(100% - 0.135em); bottom: 0.179em; width: 1.25em; height: 0.673em; overflow: visible;" aria-hidden="true"><path d="M0 44.5 C 22 42.5, 52 38.3, 71.3 29.2 C 83 20, 89.5 4, 91 -20 C 90.5 3, 86.5 20.5, 72.7 30.8 C 52.5 40.3, 22 44, 0 45.5 Z" fill="#fdfcfa" /><path d="M87.5 2 C 78 -6, 70 -18, 69.5 -30 C 80 -22, 88.5 -10, 87.5 2 Z" fill="#fdfcfa" /><path d="M83 14 C 94 5, 110 2.5, 122 6.5 C 112 20, 93 23, 83 14 Z" fill="#fdfcfa" /></svg></div>
+      <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; letter-spacing: 0.44em; color: #fdfcfa; text-indent: 0.44em;">FLORAL &amp; EVENT STYLING</div>
+    </div>
+  </div>
+
+  <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+    <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">BUSINESS CARD &middot; 3.5 &times; 2 IN</div>
+    <div style="display: flex; gap: 26px; flex-wrap: wrap;">
+      <div id="card-front" style="width: 525px; height: 300px; background: #fdfcfa; border: 1px solid #f0ece6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+        <div style="position: relative; font-family: 'Great Vibes', cursive; font-size: 54px; line-height: 1.05; color: #14120f; white-space: nowrap;">Events in Bloom<svg viewBox="0 0 130 70" fill="none" style="position: absolute; left: calc(100% - 0.135em); bottom: 0.179em; width: 1.25em; height: 0.673em; overflow: visible;" aria-hidden="true"><path d="M0 44.5 C 22 42.5, 52 38.3, 71.3 29.2 C 83 20, 89.5 4, 91 -20 C 90.5 3, 86.5 20.5, 72.7 30.8 C 52.5 40.3, 22 44, 0 45.5 Z" fill="#14120f" /><path d="M87.5 2 C 78 -6, 70 -18, 69.5 -30 C 80 -22, 88.5 -10, 87.5 2 Z" fill="#14120f" /><path d="M83 14 C 94 5, 110 2.5, 122 6.5 C 112 20, 93 23, 83 14 Z" fill="#14120f" /></svg></div>
+        <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 11px; letter-spacing: 0.42em; color: #14120f; text-indent: 0.42em;">FLORAL &amp; EVENT STYLING</div>
+      </div>
+      <div id="card-back" style="width: 525px; height: 300px; background: #14120f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;">
+        <img src="logo/svg/eib-monogram-white.svg" alt="EiB monogram" style="width: 96px; height: auto; display: block;" />
+        <div style="width: 40px; height: 1px; background: #4a4643;"></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 7px; font-family: 'Cormorant Garamond', Georgia, serif; color: #fdfcfa; font-size: 13px; letter-spacing: 0.22em;">
+          <div>HELLO@EVENTSINBLOOM.COM</div>
+          <div>(000) 000&ndash;0000</div>
+          <div>EVENTSINBLOOM.COM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: #fff; border: 1px solid #e3ded6; padding: 30px;">
+    <div style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.16em; color: #8a8378; margin-bottom: 22px;">EMAIL SIGNATURE STRIP &middot; 600 PX</div>
+    <div id="email-strip" style="width: 600px; background: #fdfcfa; padding: 22px 26px; display: flex; align-items: center; gap: 22px; border: 1px solid #f0ece6;">
+      <img src="logo/svg/eib-favicon-dark.svg" alt="EiB" style="width: 64px; height: 64px; flex: none; display: block;" />
+      <div style="width: 1px; height: 58px; background: #e3ded6; flex: none;"></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+        <div style="font-family: 'Great Vibes', cursive; font-size: 32px; line-height: 1.1; color: #14120f;">Events in Bloom</div>
+        <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 10px; letter-spacing: 0.34em; color: #55504a;">FLORAL &amp; EVENT STYLING</div>
+        <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 12px; letter-spacing: 0.1em; color: #55504a;">hello@eventsinbloom.com &middot; eventsinbloom.com</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+</body>
+</html>

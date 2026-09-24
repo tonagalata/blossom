@@ -81,6 +81,113 @@ export async function sendInquiryEmail(data: InquiryData) {
   })
 }
 
+function fmtMoney(cents: number, currency: string) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(cents / 100)
+}
+
+function ctaEmail({ to, subject, heading, intro, ctaLabel, ctaUrl, footer }: {
+  to: string; subject: string; heading: string; intro: string; ctaLabel: string; ctaUrl: string; footer?: string
+}) {
+  const fromName = process.env.MAIL_FROM_NAME || 'Events in Bloom'
+  const fromAddr = process.env.MAIL_FROM || process.env.MAIL_USER
+  return {
+    from: `"${fromName}" <${fromAddr}>`,
+    to,
+    subject,
+    text: `${heading}\n\n${intro}\n\n${ctaUrl}${footer ? `\n\n${footer}` : ''}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
+        <p style="font-size:1.1rem;font-weight:700;margin:0 0 4px">Events in Bloom</p>
+        <p style="font-size:0.8rem;color:#888;margin:0 0 24px;letter-spacing:0.1em;text-transform:uppercase">${heading}</p>
+        <p style="margin:0 0 24px;color:#333;font-size:0.95rem;line-height:1.6">${intro}</p>
+        <a href="${ctaUrl}" style="display:inline-block;padding:12px 28px;background:#1E1E1A;color:#fff;text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase">
+          ${ctaLabel}
+        </a>
+        ${footer ? `<p style="margin:24px 0 0;font-size:0.85rem;color:#888">${footer}</p>` : ''}
+        <p style="margin:8px 0 0;font-size:0.8rem;color:#aaa">Or copy this link: ${ctaUrl}</p>
+      </div>
+    `,
+  }
+}
+
+export async function sendProposalEmail(data: { to: string; customerName: string; title: string; total: number; currency: string; link: string }) {
+  const transporter = getTransporter()
+  await transporter.sendMail(ctaEmail({
+    to: data.to,
+    subject: `Your proposal: ${data.title}`,
+    heading: 'New Proposal',
+    intro: `Hi ${data.customerName}, we've put together a proposal for "${data.title}" totaling ${fmtMoney(data.total, data.currency)}. Please review and let us know if you'd like to move forward.`,
+    ctaLabel: 'View Proposal',
+    ctaUrl: data.link,
+  }))
+}
+
+export async function sendProposalAcceptedEmail(data: { customerName: string; title: string; adminLink: string }) {
+  const fromName = process.env.MAIL_FROM_NAME || 'Events in Bloom'
+  const fromAddr = process.env.MAIL_FROM || process.env.MAIL_USER
+  const toAddr = process.env.INQUIRY_TO || 'eventsinbloomdmv@gmail.com'
+  const transporter = getTransporter()
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromAddr}>`,
+    to: toAddr,
+    subject: `Proposal accepted: ${data.title}`,
+    text: `${data.customerName} accepted the proposal "${data.title}".\n\n${data.adminLink}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
+        <p style="font-size:1.1rem;font-weight:700;margin:0 0 4px">Events in Bloom</p>
+        <p style="font-size:0.8rem;color:#2e7d32;margin:0 0 24px;letter-spacing:0.1em;text-transform:uppercase">Proposal Accepted</p>
+        <p style="margin:0 0 24px;color:#333;font-size:0.95rem">${data.customerName} accepted <strong>${data.title}</strong>.</p>
+        <a href="${data.adminLink}" style="display:inline-block;padding:12px 28px;background:#1E1E1A;color:#fff;text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase">View in Admin</a>
+      </div>
+    `,
+  })
+}
+
+export async function sendProposalDeclinedEmail(data: { customerName: string; title: string; adminLink: string }) {
+  const fromName = process.env.MAIL_FROM_NAME || 'Events in Bloom'
+  const fromAddr = process.env.MAIL_FROM || process.env.MAIL_USER
+  const toAddr = process.env.INQUIRY_TO || 'eventsinbloomdmv@gmail.com'
+  const transporter = getTransporter()
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromAddr}>`,
+    to: toAddr,
+    subject: `Proposal declined: ${data.title}`,
+    text: `${data.customerName} declined the proposal "${data.title}".\n\n${data.adminLink}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
+        <p style="font-size:1.1rem;font-weight:700;margin:0 0 4px">Events in Bloom</p>
+        <p style="font-size:0.8rem;color:#c62828;margin:0 0 24px;letter-spacing:0.1em;text-transform:uppercase">Proposal Declined</p>
+        <p style="margin:0 0 24px;color:#333;font-size:0.95rem">${data.customerName} declined <strong>${data.title}</strong>.</p>
+        <a href="${data.adminLink}" style="display:inline-block;padding:12px 28px;background:#1E1E1A;color:#fff;text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase">View in Admin</a>
+      </div>
+    `,
+  })
+}
+
+export async function sendInvoiceEmail(data: { to: string; customerName: string; invoiceNumber: string; total: number; currency: string; link: string }) {
+  const transporter = getTransporter()
+  await transporter.sendMail(ctaEmail({
+    to: data.to,
+    subject: `Invoice ${data.invoiceNumber} from Events in Bloom`,
+    heading: 'New Invoice',
+    intro: `Hi ${data.customerName}, invoice ${data.invoiceNumber} for ${fmtMoney(data.total, data.currency)} is ready for your review and payment.`,
+    ctaLabel: 'View & Pay Invoice',
+    ctaUrl: data.link,
+  }))
+}
+
+export async function sendInvoicePaidEmail(data: { to: string; customerName: string; invoiceNumber: string; total: number; currency: string; link: string }) {
+  const transporter = getTransporter()
+  await transporter.sendMail(ctaEmail({
+    to: data.to,
+    subject: `Payment received — Invoice ${data.invoiceNumber}`,
+    heading: 'Payment Received',
+    intro: `Hi ${data.customerName}, thank you! We've received your payment of ${fmtMoney(data.total, data.currency)} for invoice ${data.invoiceNumber}.`,
+    ctaLabel: 'View Invoice',
+    ctaUrl: data.link,
+  }))
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   const fromName = process.env.MAIL_FROM_NAME || 'Events in Bloom'
   const fromAddr = process.env.MAIL_FROM || process.env.MAIL_USER

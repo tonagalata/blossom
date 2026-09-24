@@ -1,6 +1,13 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import type { SiteConfig, HeroSlide } from '@/lib/types'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Dialog } from '@/components/ui/Dialog'
+import { toast } from '@/components/ui/Toaster'
+import { ArrowUp, ArrowDown, Trash2, Plus } from 'lucide-react'
 
 const SLOT_LABELS = ['Preview 1', 'Preview 2', 'Preview 3', 'Preview 4']
 
@@ -12,13 +19,7 @@ export default function SiteContentAdmin() {
   const [videos, setVideos] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [toast, setToast] = useState('')
   const [pickerFor, setPickerFor] = useState<PickerTarget | null>(null)
-
-  function showToast(msg: string) {
-    setToast(msg)
-    setTimeout(() => setToast(''), 3000)
-  }
 
   useEffect(() => {
     Promise.all([
@@ -42,10 +43,10 @@ export default function SiteContentAdmin() {
     })
     setSaving(false)
     if (res.ok) {
-      showToast('Saved')
+      toast.success('Saved')
     } else {
       const data = await res.json().catch(() => null)
-      showToast(data?.message ? `Save failed: ${data.message}` : 'Save failed')
+      toast.error(data?.message ? `Save failed: ${data.message}` : 'Save failed')
     }
   }
 
@@ -95,57 +96,51 @@ export default function SiteContentAdmin() {
     save(updated)
   }
 
-  if (loading) return <div className="admin-loading">Loading…</div>
-  if (!config) return <div className="admin-loading">No config found.</div>
+  if (loading) return <p className="text-sm text-bloom-text-mid">Loading…</p>
+  if (!config) return <p className="text-sm text-bloom-text-mid">No config found.</p>
 
   const pickerIsVideo = pickerFor === 'heroSlideVideo'
 
   return (
-    <div className="admin-section">
-      <div className="admin-section-header">
-        <h2 className="admin-section-title">Site Content</h2>
-        <button
-          className="admin-btn admin-btn-primary"
-          onClick={() => save(config)}
-          disabled={saving}
-        >
-          {saving ? 'Saving…' : 'Save'}
-        </button>
-      </div>
+    <div>
+      <PageHeader
+        title="Site Content"
+        description="Hero slideshow and portfolio preview images."
+        action={<Button onClick={() => save(config)} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>}
+      />
 
-      <div className="admin-subsection">
-        <h3 className="admin-subsection-title">Hero Slideshow</h3>
-        <div className="slideshow-manager-list">
+      <div className="mb-8 rounded-lg border border-bloom-border bg-white p-5">
+        <h3 className="mb-3 text-sm font-semibold text-bloom-text">Hero Slideshow</h3>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {config.heroSlides.map((slide: HeroSlide, i) => (
-            <div key={i} className="slideshow-manager-item">
+            <div key={i} className="overflow-hidden rounded-lg border border-bloom-border">
               {slide.type === 'video' ? (
                 // eslint-disable-next-line jsx-a11y/media-has-caption
-                <video className="slideshow-preview" src={slide.src} muted />
+                <video className="aspect-video w-full object-cover" src={slide.src} muted />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img className="slideshow-preview" src={slide.src} alt="" />
+                <img className="aspect-video w-full object-cover" src={slide.src} alt="" />
               )}
-              <span className="slideshow-manager-type">{slide.type}</span>
-              <div className="slideshow-manager-controls">
-                <button className="admin-btn admin-btn-sm" onClick={() => moveSlide(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
-                <button className="admin-btn admin-btn-sm" onClick={() => moveSlide(i, 1)} disabled={i === config.heroSlides.length - 1} title="Move later">↓</button>
-                <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => removeSlide(i)}>Delete</button>
+              <div className="flex items-center justify-between px-2 py-1.5">
+                <span className="text-xs text-bloom-text-light">{slide.type}</span>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => moveSlide(i, -1)} disabled={i === 0}><ArrowUp className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => moveSlide(i, 1)} disabled={i === config.heroSlides.length - 1}><ArrowDown className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => removeSlide(i)}><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="admin-field-row" style={{ marginTop: 12 }}>
-          <button className="admin-btn admin-btn-sm" onClick={() => setPickerFor('heroSlideImage')}>+ Add Image</button>
-          <button className="admin-btn admin-btn-sm" onClick={() => setPickerFor('heroSlideVideo')}>+ Add Video</button>
+        <div className="mt-3 flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPickerFor('heroSlideImage')}><Plus className="h-3.5 w-3.5" /> Add Image</Button>
+          <Button variant="outline" size="sm" onClick={() => setPickerFor('heroSlideVideo')}><Plus className="h-3.5 w-3.5" /> Add Video</Button>
         </div>
 
-        <div className="admin-field" style={{ marginTop: 20, maxWidth: 220 }}>
-          <label className="admin-label">Slide Duration (seconds)</label>
-          <input
-            className="admin-input"
-            type="number"
-            min={1}
-            step={1}
+        <div className="mt-5 max-w-[220px]">
+          <label className="mb-1 block text-xs font-medium text-bloom-text-mid">Slide Duration (seconds)</label>
+          <Input
+            type="number" min={1} step={1}
             value={config.heroSlideDuration}
             onChange={e => setConfig({ ...config, heroSlideDuration: Number(e.target.value) })}
             onBlur={() => save({ ...config, heroSlideDuration: Math.max(1, config.heroSlideDuration || 1) })}
@@ -153,56 +148,39 @@ export default function SiteContentAdmin() {
         </div>
       </div>
 
-      <div className="site-content-slot">
-        <h3 className="admin-subsection-title">Portfolio Preview Images</h3>
-        <div className="preview-slots">
+      <div className="rounded-lg border border-bloom-border bg-white p-5">
+        <h3 className="mb-3 text-sm font-semibold text-bloom-text">Portfolio Preview Images</h3>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {config.previewImages.map((src, i) => (
-            <div key={i} className="preview-slot">
-              <span className="preview-slot-label">{SLOT_LABELS[i]}</span>
-              <div className="site-content-preview-wrap">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="site-content-preview" src={src} alt={SLOT_LABELS[i]} />
-              </div>
-              <button
-                className="admin-btn admin-btn-sm"
-                onClick={() => setPickerFor(`preview-${i}` as `preview-${number}`)}
-              >
-                Change
-              </button>
+            <div key={i}>
+              <p className="mb-1 text-xs text-bloom-text-light">{SLOT_LABELS[i]}</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="mb-2 aspect-square w-full rounded-md border border-bloom-border object-cover" src={src} alt={SLOT_LABELS[i]} />
+              <Button variant="outline" size="sm" onClick={() => setPickerFor(`preview-${i}` as `preview-${number}`)}>Change</Button>
             </div>
           ))}
         </div>
       </div>
 
-      {pickerFor !== null && (
-        <div className="admin-modal-overlay" onClick={() => setPickerFor(null)}>
-          <div className="admin-modal admin-modal-wide" onClick={e => e.stopPropagation()}>
-            <h3 className="admin-modal-title">{pickerIsVideo ? 'Pick a Video' : 'Pick an Image'}</h3>
-            <div className="image-picker-grid">
-              {pickerIsVideo ? (
-                videos.length > 0 ? videos.map(src => (
-                  <div key={src} className="image-picker-item" onClick={() => pickVideo(src)}>
-                    {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                    <video src={src} muted />
-                  </div>
-                )) : <p className="admin-loading">No videos in public/videos yet.</p>
-              ) : (
-                images.map(src => (
-                  <div key={src} className="image-picker-item" onClick={() => pickImage(src)}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" />
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="admin-modal-actions">
-              <button className="admin-btn" onClick={() => setPickerFor(null)}>Cancel</button>
-            </div>
-          </div>
+      <Dialog open={pickerFor !== null} onClose={() => setPickerFor(null)} title={pickerIsVideo ? 'Pick a Video' : 'Pick an Image'} className="max-w-2xl">
+        <div className="grid max-h-96 grid-cols-4 gap-2 overflow-y-auto sm:grid-cols-6">
+          {pickerIsVideo ? (
+            videos.length > 0 ? videos.map(src => (
+              <button key={src} onClick={() => pickVideo(src)} className="aspect-square overflow-hidden rounded-md border border-bloom-border">
+                {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                <video src={src} muted className="h-full w-full object-cover" />
+              </button>
+            )) : <p className="col-span-full text-sm text-bloom-text-mid">No videos in public/videos yet.</p>
+          ) : (
+            images.map(src => (
+              <button key={src} onClick={() => pickImage(src)} className="aspect-square overflow-hidden rounded-md border border-bloom-border">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))
+          )}
         </div>
-      )}
-
-      {toast && <div className="admin-toast">{toast}</div>}
+      </Dialog>
     </div>
   )
 }
