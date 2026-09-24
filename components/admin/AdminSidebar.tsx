@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/cn'
+import { useAuth } from '@/lib/auth-context'
 import {
   Image as ImageIcon, LayoutGrid, FileText, Home, MousePointerClick,
-  Inbox, Users, UserSquare2, FileSignature, Receipt, CreditCard,
+  Inbox, Users, UserSquare2, FileSignature, Receipt, CreditCard, UserCog,
   ChevronsLeft, ChevronsRight, ExternalLink, LogOut,
 } from 'lucide-react'
 
@@ -49,6 +50,12 @@ const groups: NavGroup[] = [
       { href: '/admin/payments', label: 'Payments', icon: CreditCard },
     ],
   },
+  {
+    heading: 'Settings',
+    items: [
+      { href: '/admin/users', label: 'Users', icon: UserCog },
+    ],
+  },
 ]
 
 export default function AdminSidebar() {
@@ -68,8 +75,10 @@ export default function AdminSidebar() {
     })
   }
 
+  const { logout } = useAuth()
+
   async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
+    await logout()
     router.push('/admin/login')
   }
 

@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { signAdminToken, COOKIE_NAME } from '@/lib/auth'
+import { verifyFirebaseIdToken } from '@/lib/verifyFirebaseToken'
+import { COOKIE_NAME, COOKIE_MAX_AGE_SECONDS } from '@/lib/auth'
+import { resolveAdminUserForLogin, touchAdminUserLogin } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
-  const { password } = await request.json()
-
-  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
+  const { idToken } = await request.json()
+  if (!idToken) {
+    return NextResponse.json({ error: 'Missing ID token' }, { status: 400 })
   }
 
-  const token = await signAdminToken()
+  const decoded = await verifyFirebaseIdToken(idToken)
+  if (!decoded) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  }
+
+  const adminUser = await resolveAdminUserForLogin(decoded.uid, decoded.email)
+  if (!adminUser || adminUser.disabled) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+  }
+
+  await touchAdminUserLogin(adminUser.id)
+
   const response = NextResponse.json({ ok: true })
-  response.cookies.set(COOKIE_NAME, token, {
+  response.cookies.set(COOKIE_NAME, idToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: COOKIE_MAX_AGE_SECONDS,
   })
   return response
 }

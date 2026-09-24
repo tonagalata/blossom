@@ -2,6 +2,7 @@ import { createClient } from '@libsql/client'
 import type {
   Inquiry, InquiryAttachment, PaymentRequest, MembershipPlan, Member, MemberInquiry, PortfolioItem,
   Customer, Proposal, ProposalStatus, LineItem, ESignature, Invoice, InvoiceStatus, DashboardStats,
+  AdminUser,
 } from './types'
 
 function makeClient() {
@@ -201,6 +202,14 @@ async function init() {
       ip_address     TEXT,
       user_agent     TEXT,
       document_hash  TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id            TEXT PRIMARY KEY,
+      email         TEXT UNIQUE NOT NULL,
+      display_name  TEXT,
+      created_at    TEXT NOT NULL,
+      disabled      INTEGER NOT NULL DEFAULT 0,
+      last_login_at TEXT
     );
   `)
 
@@ -904,6 +913,68 @@ export async function getBusinessDashboardStats(): Promise<DashboardStats> {
     activeMembers: membersActive.rows[0].n as number,
     mrr: membersActive.rows[0].mrr as number,
   }
+}
+
+// ─── Admin users ──────────────────────────────────────────────────────────────
+
+export async function listAdminUsers(): Promise<AdminUser[]> {
+  const client = await getDb()
+  const result = await client.execute('SELECT * FROM admin_users ORDER BY created_at ASC')
+  return result.rows as unknown as AdminUser[]
+}
+
+export async function getAdminUserById(id: string): Promise<AdminUser | null> {
+  const client = await getDb()
+  const result = await client.execute({ sql: 'SELECT * FROM admin_users WHERE id = ?', args: [id] })
+  return (result.rows[0] as unknown as AdminUser) ?? null
+}
+
+export async function getAdminUserByEmail(email: string): Promise<AdminUser | null> {
+  const client = await getDb()
+  const result = await client.execute({ sql: 'SELECT * FROM admin_users WHERE email = ?', args: [email] })
+  return (result.rows[0] as unknown as AdminUser) ?? null
+}
+
+// Resolves the admin_users row for a just-verified Firebase sign-in. Handles
+// the case where someone was invited (a row exists keyed by a placeholder id
+// or a different provider's uid) but this is the first time THIS uid has
+// signed in — e.g. an admin invited for email/password later using Google,
+// or vice versa — by re-keying the row to the uid that actually authenticated.
+export async function resolveAdminUserForLogin(uid: string, email: string | null): Promise<AdminUser | null> {
+  const client = await getDb()
+  const byId = await getAdminUserById(uid)
+  if (byId) return byId
+
+  if (!email) return null
+  const byEmail = await getAdminUserByEmail(email)
+  if (!byEmail) return null
+  if (byEmail.disabled) return byEmail // let the caller see it's disabled and reject explicitly
+
+  await client.execute({ sql: 'UPDATE admin_users SET id = ? WHERE email = ?', args: [uid, email] })
+  return { ...byEmail, id: uid }
+}
+
+export async function createAdminUser(u: Pick<AdminUser, 'id' | 'email' | 'display_name'>): Promise<void> {
+  const client = await getDb()
+  await client.execute({
+    sql: 'INSERT INTO admin_users (id, email, display_name, created_at) VALUES (?,?,?,?)',
+    args: [u.id, u.email, u.display_name, new Date().toISOString()],
+  })
+}
+
+export async function setAdminUserDisabled(id: string, disabled: boolean): Promise<void> {
+  const client = await getDb()
+  await client.execute({ sql: 'UPDATE admin_users SET disabled = ? WHERE id = ?', args: [disabled ? 1 : 0, id] })
+}
+
+export async function touchAdminUserLogin(id: string): Promise<void> {
+  const client = await getDb()
+  await client.execute({ sql: 'UPDATE admin_users SET last_login_at = ? WHERE id = ?', args: [new Date().toISOString(), id] })
+}
+
+export async function deleteAdminUser(id: string): Promise<void> {
+  const client = await getDb()
+  await client.execute({ sql: 'DELETE FROM admin_users WHERE id = ?', args: [id] })
 }
 
 // ─── Portfolio seed data ──────────────────────────────────────────────────────

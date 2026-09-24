@@ -1,28 +1,12 @@
-import { SignJWT, jwtVerify } from 'jose'
+import { verifyFirebaseIdToken, type FirebaseTokenPayload } from './verifyFirebaseToken'
 
-const COOKIE_NAME = 'admin-session'
-const EXPIRES_IN = '7d'
+export const COOKIE_NAME = 'admin_fb_session'
+// Firebase ID tokens expire after 1 hour; the client refreshes and re-syncs
+// this cookie well before then via onIdTokenChanged (see lib/auth-context.tsx).
+export const COOKIE_MAX_AGE_SECONDS = 60 * 55
 
-function getSecret(): Uint8Array {
-  const s = process.env.ADMIN_JWT_SECRET || 'dev-secret-change-me-in-production-32ch'
-  return new TextEncoder().encode(s)
+export type SessionUser = FirebaseTokenPayload
+
+export async function verifySessionCookie(cookie: string): Promise<SessionUser | null> {
+  return verifyFirebaseIdToken(cookie)
 }
-
-export async function signAdminToken(): Promise<string> {
-  return new SignJWT({ role: 'admin' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(EXPIRES_IN)
-    .sign(getSecret())
-}
-
-export async function verifyAdminToken(token: string): Promise<boolean> {
-  try {
-    const { payload } = await jwtVerify(token, getSecret())
-    return payload.role === 'admin'
-  } catch {
-    return false
-  }
-}
-
-export { COOKIE_NAME }

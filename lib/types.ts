@@ -283,3 +283,12 @@ export interface DashboardStats {
   activeMembers: number
   mrr: number
 }
+
+export interface AdminUser {
+  id: string // Firebase UID
+  email: string
+  display_name: string | null
+  created_at: string
+  disabled: number
+  last_login_at: string | null
+}

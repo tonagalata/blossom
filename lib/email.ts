@@ -188,6 +188,19 @@ export async function sendInvoicePaidEmail(data: { to: string; customerName: str
   }))
 }
 
+export async function sendAdminInviteEmail(data: { to: string; displayName: string }) {
+  const transporter = getTransporter()
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  await transporter.sendMail(ctaEmail({
+    to: data.to,
+    subject: `You've been added as an admin — Events in Bloom`,
+    heading: 'Admin Invitation',
+    intro: `Hi ${data.displayName || data.to}, you've been given admin access to the Events in Bloom dashboard. Sign in with Google using this email address (${data.to}), or create a password the first time you sign in.`,
+    ctaLabel: 'Go to Admin Login',
+    ctaUrl: `${origin}/admin/login`,
+  }))
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   const fromName = process.env.MAIL_FROM_NAME || 'Events in Bloom'
   const fromAddr = process.env.MAIL_FROM || process.env.MAIL_USER
