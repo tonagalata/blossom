@@ -1,4 +1,6 @@
+import { redirect } from 'next/navigation'
 import { getBusinessDashboardStats, listInquiries, listProposals, listInvoices } from '@/lib/db'
+import { getCurrentAdmin } from '@/lib/requireAdmin'
 import { PageHeader } from '@/components/admin/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
 import { StatusBadge } from '@/components/ui/Badge'
@@ -21,6 +23,9 @@ interface ActivityItem {
 }
 
 export default async function AdminDashboard() {
+  const admin = await getCurrentAdmin()
+  if (!admin) redirect('/admin/login')
+
   const [stats, inquiries, proposals, invoices] = await Promise.all([
     getBusinessDashboardStats(),
     listInquiries(),
